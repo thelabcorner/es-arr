@@ -90,7 +90,7 @@ The engine is the hard part: array element reads with a variable index cost **~7
 
 **All production bundles ship as GitHub release assets — this repo holds sources. Grab the runnable builds from the [Releases page](https://github.com/thelabcorner/es-arr/releases).**
 
-[![Release: v1.0.0](https://img.shields.io/badge/release-v1.0.0-blue)](https://github.com/thelabcorner/es-arr/releases)
+[![Release: v1.1.0](https://img.shields.io/badge/release-v1.1.0-blue)](https://github.com/thelabcorner/es-arr/releases)
 [![Released: 2026-08-10](https://img.shields.io/badge/released-2026--08--10-lightgrey)](https://github.com/thelabcorner/es-arr/releases)
 [![Downloads](https://img.shields.io/github/downloads/thelabcorner/es-arr/total?color=blueviolet)](https://github.com/thelabcorner/es-arr/releases)
 
@@ -104,8 +104,8 @@ The engine is the hard part: array element reads with a variable index cost **~7
 
 | You are... | Take this release | And this asset |
 |---|---|---|
-| Dropping one file into the Scripts folder with zero install steps (self-extracting `ESARRArray.dll` + native gate included) | v1.0.0 | `ESARR.accel.min.jsx` |
-| Loading the native DLL from your own `ExternalObject` setup | v1.0.0 | `ESARRArray.dll` |
+| Dropping one file into the Scripts folder with zero install steps (self-extracting `ESARRArray.dll` + native gate included) | v1.1.0 | `ESARR.accel.min.jsx` |
+| Loading the native DLL from your own `ExternalObject` setup | v1.1.0 | `ESARRArray.dll` |
 | Building from source / reading the implementation | master | the repo |
 
 ---
@@ -322,6 +322,16 @@ npm run fuzz           # 100k seeded differential iterations
 npm run live-verify    # vectors + wrapper semantics in the real engine (COM tool)
 npm run benchmark      # ours vs MDN-style vs hand-rolled in the real engine
 ```
+
+**Merge architecture (espack v0.3.0).** `build:accel` also emits two composition
+artifacts for hosts that bundle multiple espack consumers in one file (e.g.
+ArcFit): `dist/ESARR.manifest.json` (schema v1, payload-only, byte-identical
+to `espack-build --manifest-out`) and `dist/ESARR.facade.jsx` (loader-free
+facade + adapter, requires `ESPAK` on `$.global`). A composer merges the
+manifests with `espack-merge.mjs` into ONE loader and appends the facades.
+The adapter loads the payload **by name** (`ESPAK.load("ESARRArray")`) —
+index 0 is not a stable API under a merged bundle. The standalone
+`ESARR.accel.jsx` is unchanged in composition.
 
 The identical TypeScript core (`src/array-core.ts` ES5 set, `src/array-es3.ts` ES3 set, `src/array-es6.ts` ES6+ set, `src/sort-core.ts` shared merge sort) ships as an ESM bundle for Node (tests, differential oracle) and as the ESARR IIFE for the engine. The native gate lives in `src/native-lane.ts` (state machine + per-lane certification, ESON pattern) with the packed int32 wire isolated in `src/lane-wire.ts` (byte+1 encoding, canonical per the design doc) and the facade dispatch in `src/native-dispatch.ts`. Test vectors live in `tests/vectors.ts` with a transport protocol (`{t:'array'|'sparse'|'string'|'like'|'null'}`) that survives JSON round-trips; `tests/callbacks.ts` holds the single canonical callback/runnable logic shared by the Node harness and the live probe — engine agreement implies spec agreement by construction.
 

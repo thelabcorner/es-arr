@@ -1,6 +1,6 @@
 {
   "name": "esarr",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "ESARR — the full Array surface (ES3 built-ins + ES5 + ES6+ additions) for Adobe ExtendScript (ES3), engine-measured, spec-exact, with a native ExternalObject acceleration gate (ESARRArray.dll) and espack self-extracting accel bundle",
   "type": "module",
   "main": "dist/esarr-core.esm.mjs",
