@@ -1,0 +1,71 @@
+{
+ "engine": "4.5.6",
+ "host": "Adobe Illustrator 30.6.0",
+ "sizes": [
+  2048
+ ],
+ "reps": 9,
+ "warm": 2,
+ "lane": "sort-native",
+ "gate": true,
+ "gateLanes": "sort,toSorted,reverse,toReversed,join",
+ "dllOk": false,
+ "rows": [
+  {
+   "lane": "sort-native-mixedFull",
+   "builtin": -1,
+   "esarr": -1,
+   "mdn": -1,
+   "hand": -1,
+   "nat": 19710
+  },
+  {
+   "lane": "sort-builtin-mixedFull",
+   "builtin": 8485,
+   "esarr": -1,
+   "mdn": -1,
+   "hand": -1,
+   "nat": -1
+  },
+  {
+   "lane": "sort-native-asc",
+   "builtin": -1,
+   "esarr": -1,
+   "mdn": -1,
+   "hand": -1,
+   "nat": 18520
+  },
+  {
+   "lane": "sort-builtin-asc",
+   "builtin": 10617,
+   "esarr": -1,
+   "mdn": -1,
+   "hand": -1,
+   "nat": -1
+  },
+  {
+   "lane": "sort-native-desc",
+   "builtin": -1,
+   "esarr": -1,
+   "mdn": -1,
+   "hand": -1,
+   "nat": 18044
+  },
+  {
+   "lane": "sort-builtin-desc",
+   "builtin": 11284,
+   "esarr": -1,
+   "mdn": -1,
+   "hand": -1,
+   "nat": -1
+  },
+  {
+   "lane": "read-scan",
+   "builtin": -1,
+   "esarr": -1,
+   "mdn": -1,
+   "hand": 1578,
+   "nat": -1
+  }
+ ]
+}

@@ -1,0 +1,63 @@
+{
+ "engine": "4.5.6",
+ "host": "Adobe Illustrator 30.6.0",
+ "sizes": [
+  2048
+ ],
+ "reps": 9,
+ "warm": 2,
+ "lane": "idx",
+ "gate": false,
+ "gateLanes": "n/a",
+ "dllOk": true,
+ "rows": [
+  {
+   "lane": "idx-jsx-miss",
+   "builtin": -1,
+   "esarr": 1596,
+   "mdn": -1,
+   "hand": -1,
+   "nat": -1
+  },
+  {
+   "lane": "idx-jsx-hitfirst",
+   "builtin": -1,
+   "esarr": 5,
+   "mdn": -1,
+   "hand": -1,
+   "nat": -1
+  },
+  {
+   "lane": "idx-packscan-miss",
+   "builtin": -1,
+   "esarr": -1,
+   "mdn": -1,
+   "hand": -1,
+   "nat": 67
+  },
+  {
+   "lane": "idx-packscan-hitfirst",
+   "builtin": -1,
+   "esarr": -1,
+   "mdn": -1,
+   "hand": -1,
+   "nat": 67
+  },
+  {
+   "lane": "idx-packonly",
+   "builtin": -1,
+   "esarr": -1,
+   "mdn": -1,
+   "hand": 7123,
+   "nat": -1
+  },
+  {
+   "lane": "dll-ok",
+   "builtin": 1,
+   "esarr": -1,
+   "mdn": -1,
+   "hand": -1,
+   "nat": -1
+  }
+ ]
+}

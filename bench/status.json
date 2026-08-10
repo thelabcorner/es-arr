@@ -1,0 +1,196 @@
+{
+ "done": {
+  "2048-sort-native": {
+   "file": "round1-raw-2048-sort-native.json",
+   "at": "2026-08-10T02:30:40.635Z"
+  },
+  "2048-reverse-native": {
+   "file": "round1-raw-2048-reverse-native.json",
+   "at": "2026-08-10T02:30:41.342Z"
+  },
+  "2048-join-native": {
+   "file": "round1-raw-2048-join-native.json",
+   "at": "2026-08-10T02:30:42.016Z"
+  },
+  "2048-idx": {
+   "file": "round1-raw-2048-idx.json",
+   "at": "2026-08-10T02:30:42.552Z"
+  },
+  "2048-payloads": {
+   "file": "round1-raw-2048-payloads.json",
+   "at": "2026-08-10T02:30:46.195Z"
+  },
+  "4096-sort-native": {
+   "file": "round1-raw-4096-sort-native.json",
+   "at": "2026-08-10T02:30:52.654Z"
+  },
+  "4096-reverse-native": {
+   "file": "round1-raw-4096-reverse-native.json",
+   "at": "2026-08-10T02:30:54.846Z"
+  },
+  "4096-join-native": {
+   "file": "round1-raw-4096-join-native.json",
+   "at": "2026-08-10T02:30:56.100Z"
+  },
+  "4096-sort-jsx": {
+   "file": "round1-raw-4096-sort-jsx.json",
+   "at": "2026-08-10T02:31:09.226Z"
+  },
+  "4096-reverse-jsx": {
+   "file": "round1-raw-4096-reverse-jsx.json",
+   "at": "2026-08-10T02:31:10.119Z"
+  },
+  "4096-join-jsx": {
+   "file": "round1-raw-4096-join-jsx.json",
+   "at": "2026-08-10T02:31:11.286Z"
+  },
+  "4096-idx": {
+   "file": "round1-raw-4096-idx.json",
+   "at": "2026-08-10T02:31:12.423Z"
+  },
+  "4096-payloads": {
+   "file": "round1-raw-4096-payloads.json",
+   "at": "2026-08-10T02:31:26.602Z"
+  },
+  "8192-sort-native": {
+   "file": "round1-raw-8192-sort-native.json",
+   "at": "2026-08-10T02:31:44.869Z"
+  },
+  "8192-reverse-native": {
+   "file": "round1-raw-8192-reverse-native.json",
+   "at": "2026-08-10T02:31:52.915Z"
+  },
+  "8192-join-native": {
+   "file": "round1-raw-8192-join-native.json",
+   "at": "2026-08-10T02:31:57.571Z"
+  },
+  "8192-sort-jsx": {
+   "file": "round1-raw-8192-sort-jsx.json",
+   "at": "2026-08-10T02:32:47.951Z"
+  },
+  "8192-reverse-jsx": {
+   "file": "round1-raw-8192-reverse-jsx.json",
+   "at": "2026-08-10T02:32:51.318Z"
+  },
+  "8192-join-jsx": {
+   "file": "round1-raw-8192-join-jsx.json",
+   "at": "2026-08-10T02:32:55.287Z"
+  },
+  "8192-packhunt": {
+   "file": "round1-raw-8192-packhunt.json",
+   "at": "2026-08-10T03:36:14.159Z"
+  },
+  "8192-idx": {
+   "file": "round1-raw-8192-idx.json",
+   "at": "2026-08-10T02:33:21.154Z"
+  },
+  "8192-payloads": {
+   "file": "round1-raw-8192-payloads.json",
+   "at": "2026-08-10T02:34:15.377Z"
+  },
+  "16384-sort-native": {
+   "file": "round1-raw-16384-sort-native.json",
+   "at": "2026-08-10T02:36:49.500Z"
+  },
+  "16384-reverse-native": {
+   "file": "round1-raw-16384-reverse-native.json",
+   "at": "2026-08-10T02:37:03.318Z"
+  },
+  "16384-join-native": {
+   "file": "round1-raw-16384-join-native.json",
+   "at": "2026-08-10T02:37:09.825Z"
+  },
+  "16384-sort-jsx": {
+   "file": "round1-raw-16384-sort-jsx.json",
+   "at": "2026-08-10T02:38:59.413Z"
+  },
+  "16384-reverse-jsx": {
+   "file": "round1-raw-16384-reverse-jsx.json",
+   "at": "2026-08-10T02:39:06.835Z"
+  },
+  "16384-join-jsx": {
+   "file": "round1-raw-16384-join-jsx.json",
+   "at": "2026-08-10T02:39:13.125Z"
+  },
+  "16384-packhunt": {
+   "file": "round1-raw-16384-packhunt.json",
+   "at": "2026-08-10T02:39:49.095Z"
+  },
+  "16384-payloads": {
+   "file": "round1-raw-16384-payloads.json",
+   "at": "2026-08-10T02:41:26.781Z"
+  },
+  "32768-sort-native": {
+   "file": "round1-raw-32768-sort-native.json",
+   "at": "2026-08-10T02:43:32.933Z"
+  },
+  "32768-reverse-native": {
+   "file": "round1-raw-32768-reverse-native.json",
+   "at": "2026-08-10T02:44:35.926Z"
+  },
+  "32768-join-native": {
+   "file": "round1-raw-32768-join-native.json",
+   "at": "2026-08-10T02:45:01.752Z"
+  },
+  "32768-sort-jsx": {
+   "file": "round1-raw-32768-sort-jsx.json",
+   "at": "2026-08-10T02:56:09.413Z"
+  },
+  "32768-reverse-jsx": {
+   "file": "round1-raw-32768-reverse-jsx.json",
+   "at": "2026-08-10T02:56:52.530Z"
+  },
+  "32768-join-jsx": {
+   "file": "round1-raw-32768-join-jsx.json",
+   "at": "2026-08-10T02:57:59.658Z"
+  }
+ },
+ "started": {
+  "2048-sort-native": "2026-08-10T02:30:34.445Z",
+  "2048-reverse-native": "2026-08-10T02:30:40.636Z",
+  "2048-join-native": "2026-08-10T02:30:41.343Z",
+  "2048-idx": "2026-08-10T02:30:42.017Z",
+  "2048-payloads": "2026-08-10T02:30:42.553Z",
+  "4096-sort-native": "2026-08-10T02:30:46.196Z",
+  "4096-reverse-native": "2026-08-10T02:30:52.654Z",
+  "4096-join-native": "2026-08-10T02:30:54.846Z",
+  "4096-sort-jsx": "2026-08-10T02:30:56.101Z",
+  "4096-reverse-jsx": "2026-08-10T02:31:09.226Z",
+  "4096-join-jsx": "2026-08-10T02:31:10.119Z",
+  "4096-idx": "2026-08-10T02:31:11.286Z",
+  "4096-payloads": "2026-08-10T02:31:12.423Z",
+  "8192-sort-native": "2026-08-10T02:31:26.603Z",
+  "8192-reverse-native": "2026-08-10T02:31:44.869Z",
+  "8192-join-native": "2026-08-10T02:31:52.916Z",
+  "8192-sort-jsx": "2026-08-10T02:31:57.571Z",
+  "8192-reverse-jsx": "2026-08-10T02:32:47.952Z",
+  "8192-join-jsx": "2026-08-10T02:32:51.319Z",
+  "8192-packhunt": "2026-08-10T03:35:50.765Z",
+  "8192-idx": "2026-08-10T02:33:17.144Z",
+  "8192-payloads": "2026-08-10T02:33:21.154Z",
+  "16384-sort-native": "2026-08-10T02:36:17.443Z",
+  "16384-reverse-native": "2026-08-10T02:36:49.502Z",
+  "16384-join-native": "2026-08-10T02:37:03.319Z",
+  "16384-sort-jsx": "2026-08-10T02:37:09.825Z",
+  "16384-reverse-jsx": "2026-08-10T02:38:59.415Z",
+  "16384-join-jsx": "2026-08-10T02:39:06.836Z",
+  "16384-packhunt": "2026-08-10T02:39:13.126Z",
+  "16384-payloads": "2026-08-10T02:39:49.096Z",
+  "32768-sort-native": "2026-08-10T02:41:26.782Z",
+  "32768-reverse-native": "2026-08-10T02:43:32.934Z",
+  "32768-join-native": "2026-08-10T02:44:35.927Z",
+  "32768-sort-jsx": "2026-08-10T02:45:01.752Z",
+  "32768-reverse-jsx": "2026-08-10T02:56:09.414Z",
+  "32768-join-jsx": "2026-08-10T02:56:52.531Z",
+  "32768-packhunt": "2026-08-10T02:57:59.659Z",
+  "32768-payloads": "2026-08-10T03:06:29.669Z",
+  "48000-sort-native": "2026-08-10T03:22:59.686Z",
+  "48000-reverse-native": "2026-08-10T03:31:29.701Z",
+  "48000-join-native": "2026-08-10T03:34:14.507Z",
+  "48000-sort-jsx": "2026-08-10T03:34:17.680Z",
+  "48000-reverse-jsx": "2026-08-10T03:34:20.848Z",
+  "48000-join-jsx": "2026-08-10T03:34:24.012Z",
+  "48000-packhunt": "2026-08-10T03:34:27.176Z",
+  "48000-payloads": "2026-08-10T03:34:30.341Z"
+ }
+}

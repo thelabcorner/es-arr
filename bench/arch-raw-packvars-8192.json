@@ -1,0 +1,113 @@
+{
+ "engine": "4.5.6",
+ "host": "Adobe Illustrator 30.6.0",
+ "sizes": [
+  8192
+ ],
+ "reps": 9,
+ "warm": 2,
+ "lane": "packvars",
+ "dllOk": false,
+ "rows": [
+  {
+   "lane": "pack-v1",
+   "v": 75317,
+   "u": "us"
+  },
+  {
+   "lane": "pack-u4-full",
+   "v": 76593,
+   "u": "us"
+  },
+  {
+   "lane": "pack-u8-full",
+   "v": 77370,
+   "u": "us"
+  },
+  {
+   "lane": "pack-u16-full",
+   "v": 77515,
+   "u": "us"
+  },
+  {
+   "lane": "pack-u8-fast",
+   "v": 71089,
+   "u": "us"
+  },
+  {
+   "lane": "pack-u8-fastshift",
+   "v": 69270,
+   "u": "us"
+  },
+  {
+   "lane": "pack-u16-fastshift",
+   "v": 70776,
+   "u": "us"
+  },
+  {
+   "lane": "packed-len",
+   "v": 32768,
+   "u": "chars"
+  },
+  {
+   "lane": "unpack-v1-fresh",
+   "v": 48872,
+   "u": "us"
+  },
+  {
+   "lane": "unpack-u8-fresh",
+   "v": 48892,
+   "u": "us"
+  },
+  {
+   "lane": "unpack-u16-fresh",
+   "v": 49877,
+   "u": "us"
+  },
+  {
+   "lane": "unpack-v1-into-O",
+   "v": 76979,
+   "u": "us"
+  },
+  {
+   "lane": "unpack-u8-into-O",
+   "v": 77232,
+   "u": "us"
+  },
+  {
+   "lane": "unpack-u16-into-O",
+   "v": 75264,
+   "u": "us"
+  },
+  {
+   "lane": "read-scan",
+   "v": 46256,
+   "u": "us"
+  },
+  {
+   "lane": "read-scan-u8",
+   "v": 45396,
+   "u": "us"
+  },
+  {
+   "lane": "fcc-4arg",
+   "v": 40346,
+   "u": "us"
+  },
+  {
+   "lane": "fcc-3arg",
+   "v": 28454,
+   "u": "us"
+  },
+  {
+   "lane": "packed-len-2",
+   "v": 32768,
+   "u": "chars"
+  },
+  {
+   "lane": "correct-u8-rt",
+   "v": 1,
+   "u": "bool"
+  }
+ ]
+}

@@ -1,0 +1,58 @@
+{
+ "engine": "4.5.6",
+ "host": "Adobe Illustrator 30.6.0",
+ "sizes": [
+  8192
+ ],
+ "reps": 9,
+ "warm": 2,
+ "lane": "base2048",
+ "dllOk": false,
+ "rows": [
+  {
+   "lane": "pack4-fastshift",
+   "v": 72826,
+   "u": "us"
+  },
+  {
+   "lane": "pack3-fastshift",
+   "v": 69844,
+   "u": "us"
+  },
+  {
+   "lane": "packed4-len",
+   "v": 32768,
+   "u": "chars"
+  },
+  {
+   "lane": "packed3-len",
+   "v": 24576,
+   "u": "chars"
+  },
+  {
+   "lane": "unpack4-fresh",
+   "v": 48716,
+   "u": "us"
+  },
+  {
+   "lane": "unpack3-fresh",
+   "v": 38634,
+   "u": "us"
+  },
+  {
+   "lane": "unpack4-into-O",
+   "v": 75668,
+   "u": "us"
+  },
+  {
+   "lane": "unpack3-into-O",
+   "v": 66215,
+   "u": "us"
+  },
+  {
+   "lane": "correct-3char-rt",
+   "v": 1,
+   "u": "bool"
+  }
+ ]
+}

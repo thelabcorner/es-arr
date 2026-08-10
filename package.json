@@ -1,0 +1,44 @@
+{
+  "name": "esarr",
+  "version": "1.0.0",
+  "description": "ESARR — the full Array surface (ES3 built-ins + ES5 + ES6+ additions) for Adobe ExtendScript (ES3), engine-measured, spec-exact, with a native ExternalObject acceleration gate (ESARRArray.dll) and espack self-extracting accel bundle",
+  "type": "module",
+  "main": "dist/esarr-core.esm.mjs",
+  "scripts": {
+    "build": "node esarr-build.mjs",
+    "build:accel": "node esarr-build.mjs --accel",
+    "native-build": "powershell -ExecutionPolicy Bypass -File native/build.ps1",
+    "test": "node tests/esarr-test.mjs",
+    "typecheck": "npx tsc --noEmit -p .",
+    "fuzz": "node tests/fuzz.mjs",
+    "benchmark": "node tests/benchmark.mjs",
+    "live-verify": "node tests/esarr-live-verify.mjs",
+    "accel-e2e": "node tests/esarr-accel-e2e.mjs",
+    "vendor-sync": "node esarr-vendor-sync.mjs",
+    "vendor-sync-check": "node esarr-vendor-sync.mjs --check"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.1",
+    "typescript": "^5.8.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "license": "GPL-3.0-or-later",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/thelabcorner/es-arr.git"
+  },
+  "keywords": [
+    "array",
+    "forEach",
+    "map",
+    "filter",
+    "reduce",
+    "indexOf",
+    "polyfill",
+    "extendscript",
+    "es3",
+    "illustrator"
+  ]
+}

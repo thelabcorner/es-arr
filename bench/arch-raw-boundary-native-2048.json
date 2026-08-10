@@ -1,0 +1,48 @@
+{
+ "engine": "4.5.6",
+ "host": "Adobe Illustrator 30.6.0",
+ "sizes": [
+  2048
+ ],
+ "reps": 9,
+ "warm": 2,
+ "lane": "boundary-native",
+ "dllOk": true,
+ "rows": [
+  {
+   "lane": "gate-on",
+   "v": 1,
+   "u": "bool"
+  },
+  {
+   "lane": "builtin-sort",
+   "v": 8504,
+   "u": "us"
+  },
+  {
+   "lane": "builtin-reverse",
+   "v": 918,
+   "u": "us"
+  },
+  {
+   "lane": "builtin-join",
+   "v": 1376,
+   "u": "us"
+  },
+  {
+   "lane": "native-sort",
+   "v": 20936,
+   "u": "us"
+  },
+  {
+   "lane": "native-reverse",
+   "v": 31141,
+   "u": "us"
+  },
+  {
+   "lane": "native-join",
+   "v": 9839,
+   "u": "us"
+  }
+ ]
+}

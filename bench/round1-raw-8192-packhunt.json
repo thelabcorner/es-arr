@@ -1,0 +1,127 @@
+{
+ "engine": "4.5.6",
+ "host": "Adobe Illustrator 30.6.0",
+ "sizes": [
+  8192
+ ],
+ "reps": 9,
+ "warm": 2,
+ "lane": "packhunt",
+ "gate": false,
+ "gateLanes": "n/a",
+ "dllOk": true,
+ "rows": [
+  {
+   "lane": "pack-only",
+   "builtin": -1,
+   "esarr": -1,
+   "mdn": -1,
+   "hand": 75185,
+   "nat": -1
+  },
+  {
+   "lane": "unpack-only",
+   "builtin": -1,
+   "esarr": -1,
+   "mdn": -1,
+   "hand": 51119,
+   "nat": -1
+  },
+  {
+   "lane": "classify-only",
+   "builtin": -1,
+   "esarr": -1,
+   "mdn": -1,
+   "hand": 55217,
+   "nat": -1
+  },
+  {
+   "lane": "native-sort-op",
+   "builtin": -1,
+   "esarr": -1,
+   "mdn": -1,
+   "hand": -1,
+   "nat": 1501
+  },
+  {
+   "lane": "native-reverse-op",
+   "builtin": -1,
+   "esarr": -1,
+   "mdn": -1,
+   "hand": -1,
+   "nat": 653
+  },
+  {
+   "lane": "native-join-op",
+   "builtin": -1,
+   "esarr": -1,
+   "mdn": -1,
+   "hand": -1,
+   "nat": 758
+  },
+  {
+   "lane": "pipe-engine",
+   "builtin": 181475,
+   "esarr": -1,
+   "mdn": -1,
+   "hand": -1,
+   "nat": -1
+  },
+  {
+   "lane": "pipe-packonce",
+   "builtin": -1,
+   "esarr": -1,
+   "mdn": -1,
+   "hand": -1,
+   "nat": 140701
+  },
+  {
+   "lane": "pipe-percall",
+   "builtin": -1,
+   "esarr": -1,
+   "mdn": -1,
+   "hand": -1,
+   "nat": 457890
+  },
+  {
+   "lane": "gated-sort-full",
+   "builtin": -1,
+   "esarr": -1,
+   "mdn": -1,
+   "hand": -1,
+   "nat": 195817
+  },
+  {
+   "lane": "writeback-only",
+   "builtin": -1,
+   "esarr": -1,
+   "mdn": -1,
+   "hand": 103858,
+   "nat": -1
+  },
+  {
+   "lane": "fused-pack-only",
+   "builtin": -1,
+   "esarr": -1,
+   "mdn": -1,
+   "hand": 110253,
+   "nat": -1
+  },
+  {
+   "lane": "fused-unpack-into-O",
+   "builtin": -1,
+   "esarr": -1,
+   "mdn": -1,
+   "hand": 75920,
+   "nat": -1
+  },
+  {
+   "lane": "dll-ok",
+   "builtin": 1,
+   "esarr": -1,
+   "mdn": -1,
+   "hand": -1,
+   "nat": -1
+  }
+ ]
+}

@@ -1,0 +1,55 @@
+{
+ "engine": "4.5.6",
+ "host": "Adobe Illustrator 30.6.0",
+ "sizes": [
+  4096
+ ],
+ "reps": 9,
+ "warm": 2,
+ "lane": "payloads",
+ "gate": true,
+ "gateLanes": "n/a",
+ "dllOk": false,
+ "rows": [
+  {
+   "lane": "sparse-sort-builtin",
+   "builtin": 34603,
+   "esarr": -1,
+   "mdn": -1,
+   "hand": -1,
+   "nat": -1
+  },
+  {
+   "lane": "sparse-sort-gated",
+   "builtin": -1,
+   "esarr": -1,
+   "mdn": -1,
+   "hand": -1,
+   "nat": 861331
+  },
+  {
+   "lane": "arraylike-sort-builtin",
+   "builtin": 33104,
+   "esarr": -1,
+   "mdn": -1,
+   "hand": -1,
+   "nat": -1
+  },
+  {
+   "lane": "arraylike-sort-gated",
+   "builtin": -1,
+   "esarr": -1,
+   "mdn": -1,
+   "hand": -1,
+   "nat": 50808
+  },
+  {
+   "lane": "dll-ok",
+   "builtin": 1,
+   "esarr": -1,
+   "mdn": -1,
+   "hand": -1,
+   "nat": -1
+  }
+ ]
+}

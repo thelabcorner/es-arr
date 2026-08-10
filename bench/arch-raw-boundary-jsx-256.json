@@ -1,0 +1,28 @@
+{
+ "engine": "4.5.6",
+ "host": "Adobe Illustrator 30.6.0",
+ "sizes": [
+  256
+ ],
+ "reps": 9,
+ "warm": 2,
+ "lane": "boundary-jsx",
+ "dllOk": false,
+ "rows": [
+  {
+   "lane": "jsx-sort",
+   "v": 7120,
+   "u": "us"
+  },
+  {
+   "lane": "jsx-reverse",
+   "v": 104,
+   "u": "us"
+  },
+  {
+   "lane": "jsx-join",
+   "v": 298,
+   "u": "us"
+  }
+ ]
+}

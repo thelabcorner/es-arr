@@ -1,0 +1,23 @@
+{
+ "engine": "4.5.6",
+ "host": "Adobe Illustrator 30.6.0",
+ "sizes": [
+  4096
+ ],
+ "reps": 9,
+ "warm": 2,
+ "lane": "sort-jsx",
+ "gate": false,
+ "gateLanes": "n/a",
+ "dllOk": false,
+ "rows": [
+  {
+   "lane": "sort-jsx",
+   "builtin": -1,
+   "esarr": 879265,
+   "mdn": -1,
+   "hand": -1,
+   "nat": -1
+  }
+ ]
+}

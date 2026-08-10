@@ -1,0 +1,83 @@
+{
+ "engine": "4.5.6",
+ "host": "Adobe Illustrator 30.6.0",
+ "sizes": [
+  65536
+ ],
+ "reps": 3,
+ "warm": 2,
+ "lane": "bigsort",
+ "dllOk": true,
+ "rows": [
+  {
+   "lane": "builtin-sort",
+   "v": 7237145,
+   "u": "us"
+  },
+  {
+   "lane": "builtin-reverse",
+   "v": 2579544,
+   "u": "us"
+  },
+  {
+   "lane": "builtin-join",
+   "v": 3420934,
+   "u": "us"
+  },
+  {
+   "lane": "native-sort-v1",
+   "v": 8707106,
+   "u": "us"
+  },
+  {
+   "lane": "native-sort-u8",
+   "v": 8886621,
+   "u": "us"
+  },
+  {
+   "lane": "native-reverse-v1",
+   "v": 8531832,
+   "u": "us"
+  },
+  {
+   "lane": "native-reverse-u8",
+   "v": 8620123,
+   "u": "us"
+  },
+  {
+   "lane": "native-join-v1",
+   "v": 4745830,
+   "u": "us"
+  },
+  {
+   "lane": "native-join-u8",
+   "v": 4738347,
+   "u": "us"
+  },
+  {
+   "lane": "native-sort-op",
+   "v": 12187,
+   "u": "us"
+  },
+  {
+   "lane": "native-reverse-op",
+   "v": 5098,
+   "u": "us"
+  },
+  {
+   "lane": "native-join-op",
+   "v": 6446,
+   "u": "us"
+  },
+  {
+   "lane": "correct-native-sort",
+   "v": 1,
+   "u": "bool"
+  },
+  {
+   "lane": "dll-version",
+   "v": "ESARRArray 1.0.0 (ESARR native lanes; byte+1 wire)",
+   "u": "str"
+  }
+ ]
+}

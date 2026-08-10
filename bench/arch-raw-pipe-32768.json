@@ -1,0 +1,68 @@
+{
+ "engine": "4.5.6",
+ "host": "Adobe Illustrator 30.6.0",
+ "sizes": [
+  32768
+ ],
+ "reps": 3,
+ "warm": 2,
+ "lane": "pipe",
+ "dllOk": true,
+ "rows": [
+  {
+   "lane": "pipe-engine",
+   "v": 2916849,
+   "u": "us"
+  },
+  {
+   "lane": "pipe-packonce",
+   "v": 1576735,
+   "u": "us"
+  },
+  {
+   "lane": "pack-only",
+   "v": 1405201,
+   "u": "us"
+  },
+  {
+   "lane": "unpack-only",
+   "v": 509483,
+   "u": "us"
+  },
+  {
+   "lane": "native-sort-op",
+   "v": 6429,
+   "u": "us"
+  },
+  {
+   "lane": "native-reverse-op",
+   "v": 2567,
+   "u": "us"
+  },
+  {
+   "lane": "native-join-op",
+   "v": 3270,
+   "u": "us"
+  },
+  {
+   "lane": "gate-on",
+   "v": 1,
+   "u": "bool"
+  },
+  {
+   "lane": "pipe-percall",
+   "v": 5231301,
+   "u": "us"
+  },
+  {
+   "lane": "gated-sort-full",
+   "v": 2043863,
+   "u": "us"
+  },
+  {
+   "lane": "dll-ok",
+   "v": 1,
+   "u": "bool"
+  }
+ ]
+}

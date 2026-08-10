@@ -1,0 +1,14 @@
+node_modules/
+dist/
+native/bin/
+.idea/
+*.log
+__pycache__/
+*.pyc
+tests/.esb64-test.bundle.mjs
+tests/.esb64-live-verify.bundle.mjs
+tests/.esb64-fuzz.bundle.mjs
+tests/.esarr-test.bundle.mjs
+tests/.esarr-fuzz.bundle.mjs
+tests/.esarr-callbacks.bundle.mjs
+tests/.esarr-vectors.bundle.mjs

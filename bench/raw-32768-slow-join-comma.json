@@ -1,0 +1,1 @@
+{"ok": true, "op": "eval", "result": {"engine": "4.5.6", "host": "Adobe Illustrator 30.6.0", "sizes": [32768], "reps": 3, "warm": 2, "group": "slow-lane", "rows": [{"lane": "join-comma", "builtin": 942024, "esarr": -1, "mdn": -1, "hand": -1}]}, "elapsed": 39.766, "jsonLane": "espack-native", "timings": {"lock": 0.0, "command": 39.75}}

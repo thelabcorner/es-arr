@@ -1,0 +1,122 @@
+{
+ "done": {
+  "packvars-8192": {
+   "file": "arch-raw-packvars-8192.json",
+   "at": "2026-08-10T14:44:46.204Z"
+  },
+  "packvars-32768": {
+   "file": "arch-raw-packvars-32768.json",
+   "at": "2026-08-10T14:46:20.699Z"
+  },
+  "chunked-65536": {
+   "file": "arch-raw-chunked-65536.json",
+   "at": "2026-08-10T14:51:26.160Z"
+  },
+  "bigsort-65536": {
+   "file": "arch-raw-bigsort-65536.json",
+   "at": "2026-08-10T15:01:37.124Z"
+  },
+  "base2048-8192": {
+   "file": "arch-raw-base2048-8192.json",
+   "at": "2026-08-10T15:02:44.846Z"
+  },
+  "pipe-32768": {
+   "file": "arch-raw-pipe-32768.json",
+   "at": "2026-08-10T15:22:58.882Z"
+  },
+  "boundary-native-128": {
+   "file": "arch-raw-boundary-native-128.json",
+   "at": "2026-08-10T15:50:07.916Z"
+  },
+  "boundary-native-256": {
+   "file": "arch-raw-boundary-native-256.json",
+   "at": "2026-08-10T15:50:08.177Z"
+  },
+  "boundary-native-512": {
+   "file": "arch-raw-boundary-native-512.json",
+   "at": "2026-08-10T15:50:08.515Z"
+  },
+  "boundary-native-1024": {
+   "file": "arch-raw-boundary-native-1024.json",
+   "at": "2026-08-10T15:50:09.020Z"
+  },
+  "boundary-native-2048": {
+   "file": "arch-raw-boundary-native-2048.json",
+   "at": "2026-08-10T15:50:10.209Z"
+  },
+  "boundary-jsx-128": {
+   "file": "arch-raw-boundary-jsx-128.json",
+   "at": "2026-08-10T15:50:33.386Z"
+  },
+  "boundary-jsx-256": {
+   "file": "arch-raw-boundary-jsx-256.json",
+   "at": "2026-08-10T15:50:33.725Z"
+  },
+  "boundary-jsx-512": {
+   "file": "arch-raw-boundary-jsx-512.json",
+   "at": "2026-08-10T15:50:34.163Z"
+  },
+  "boundary-jsx-1024": {
+   "file": "arch-raw-boundary-jsx-1024.json",
+   "at": "2026-08-10T15:50:35.022Z"
+  },
+  "boundary-jsx-2048": {
+   "file": "arch-raw-boundary-jsx-2048.json",
+   "at": "2026-08-10T15:50:37.694Z"
+  },
+  "payloads2-8192": {
+   "file": "arch-raw-payloads2-8192.json",
+   "at": "2026-08-10T15:50:55.427Z"
+  },
+  "scan-2048": {
+   "file": "arch-raw-scan-2048.json",
+   "at": "2026-08-10T15:51:21.268Z"
+  },
+  "scan-8192": {
+   "file": "arch-raw-scan-8192.json",
+   "at": "2026-08-10T15:51:24.702Z"
+  },
+  "scan-32768": {
+   "file": "arch-raw-scan-32768.json",
+   "at": "2026-08-10T15:51:45.627Z"
+  },
+  "pipeband-2048": {
+   "file": "arch-raw-pipeband-2048.json",
+   "at": "2026-08-10T15:52:09.276Z"
+  },
+  "pipeband-4096": {
+   "file": "arch-raw-pipeband-4096.json",
+   "at": "2026-08-10T15:52:12.388Z"
+  },
+  "pipeband-48000": {
+   "file": "arch-raw-pipeband-48000.json",
+   "at": "2026-08-10T15:55:50.369Z"
+  }
+ },
+ "started": {
+  "packvars-8192": "2026-08-10T14:44:31.458Z",
+  "packvars-32768": "2026-08-10T14:44:46.272Z",
+  "chunked-65536": "2026-08-10T14:47:16.245Z",
+  "bigsort-65536": "2026-08-10T14:52:14.845Z",
+  "base2048-8192": "2026-08-10T15:02:38.533Z",
+  "chunked-131072": "2026-08-10T15:02:44.910Z",
+  "pipe-32768": "2026-08-10T15:21:21.197Z",
+  "boundary-native-128": "2026-08-10T15:50:07.670Z",
+  "boundary-native-256": "2026-08-10T15:50:07.916Z",
+  "boundary-native-512": "2026-08-10T15:50:08.177Z",
+  "boundary-native-1024": "2026-08-10T15:50:08.515Z",
+  "boundary-native-2048": "2026-08-10T15:50:09.020Z",
+  "boundary-jsx-128": "2026-08-10T15:50:33.134Z",
+  "boundary-jsx-256": "2026-08-10T15:50:33.387Z",
+  "boundary-jsx-512": "2026-08-10T15:50:33.726Z",
+  "boundary-jsx-1024": "2026-08-10T15:50:34.164Z",
+  "boundary-jsx-2048": "2026-08-10T15:50:35.022Z",
+  "payloads2-8192": "2026-08-10T15:50:37.759Z",
+  "scan-2048": "2026-08-10T15:51:20.919Z",
+  "scan-8192": "2026-08-10T15:51:21.269Z",
+  "scan-32768": "2026-08-10T15:51:24.703Z",
+  "pipeband-2048": "2026-08-10T15:52:08.190Z",
+  "pipeband-4096": "2026-08-10T15:52:09.277Z",
+  "pipeband-48000": "2026-08-10T15:52:12.389Z"
+ }
+}

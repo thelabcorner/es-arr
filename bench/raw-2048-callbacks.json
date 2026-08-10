@@ -1,0 +1,82 @@
+{
+ "engine": "4.5.6",
+ "host": "Adobe Illustrator 30.6.0",
+ "sizes": [
+  2048
+ ],
+ "reps": 9,
+ "warm": 2,
+ "group": "callbacks",
+ "rows": [
+  {
+   "lane": "forEach",
+   "builtin": -1,
+   "esarr": 2761,
+   "mdn": 3687,
+   "hand": 1720
+  },
+  {
+   "lane": "map",
+   "builtin": -1,
+   "esarr": 4870,
+   "mdn": 5903,
+   "hand": 3310
+  },
+  {
+   "lane": "filter",
+   "builtin": -1,
+   "esarr": 4353,
+   "mdn": 5332,
+   "hand": 2659
+  },
+  {
+   "lane": "every",
+   "builtin": -1,
+   "esarr": 2740,
+   "mdn": 3784,
+   "hand": 1849
+  },
+  {
+   "lane": "some",
+   "builtin": -1,
+   "esarr": 2690,
+   "mdn": 4157,
+   "hand": 1970
+  },
+  {
+   "lane": "indexOf-miss",
+   "builtin": -1,
+   "esarr": 2046,
+   "mdn": 2005,
+   "hand": 1791
+  },
+  {
+   "lane": "lastIndexOf",
+   "builtin": -1,
+   "esarr": 1863,
+   "mdn": 2047,
+   "hand": 2048
+  },
+  {
+   "lane": "reduce",
+   "builtin": -1,
+   "esarr": 3057,
+   "mdn": 3001,
+   "hand": 1745
+  },
+  {
+   "lane": "reduceRight",
+   "builtin": -1,
+   "esarr": 3196,
+   "mdn": 2887,
+   "hand": 1728
+  },
+  {
+   "lane": "includes-miss",
+   "builtin": -1,
+   "esarr": 1977,
+   "mdn": -1,
+   "hand": 1720
+  }
+ ]
+}

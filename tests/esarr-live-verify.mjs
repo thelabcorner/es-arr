@@ -1,0 +1,383 @@
+#!/usr/bin/env node
+// ESARR live verification — FULL SURFACE: runs the shared vector battery
+// inside the REAL Adobe engine through ILLUSTRATOR_COM_TOOL.py and compares
+// each engine result (return value AND post-mutation state for mutating ops)
+// against the Node-side core (which npm test has already validated against
+// Node's native Array methods). This is the engine-parity check: the same
+// bundle must produce identical results in the ES3 engine, and the installed
+// prototype wrappers must match spec semantics.
+//
+// Modes: the probe always runs the corpus in pure-JSX mode (the default
+// state). When a native DLL is available AND ESARR.enableNativeGate succeeds,
+// the probe runs a SECOND pass with the gate on; the harness requires the two
+// passes to be byte-identical to each other AND to the Node-validated core
+// (the gate may only change speed, never results).
+import { execFileSync } from 'node:child_process';
+import { existsSync, mkdirSync, writeFileSync, readFileSync, readdirSync } from 'node:fs';
+import { join, dirname } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+
+var ROOT = dirname(fileURLToPath(import.meta.url));
+var PROJECT = join(ROOT, '..');
+var DIST = join(PROJECT, 'dist');
+var VENDOR = join(DIST, 'vendor-esarr.js');
+var TOOL = 'C:/Program Files/Adobe/Adobe Illustrator 2026/Presets/en_US/Scripts/agent-skills/illustrator-com-automation-skill/comtool/ILLUSTRATOR_COM_TOOL.py';
+
+if (!existsSync(VENDOR)) {
+  console.error('live-verify: build first (npm run build) - ' + VENDOR + ' missing');
+  process.exit(1);
+}
+if (!existsSync(TOOL)) {
+  console.error('live-verify: COM tool not found at ' + TOOL);
+  process.exit(1);
+}
+
+var core = await import(pathToFileURL(join(DIST, 'esarr-core.esm.mjs')).href);
+
+// Bundle tests/callbacks.ts to ESM so Node can run the same vector logic.
+var CB_BUNDLE = join(ROOT, '.esarr-callbacks.bundle.mjs');
+execFileSync(process.execPath, [esbuildBin(), join(ROOT, 'callbacks.ts'),
+  '--bundle', '--outfile=' + CB_BUNDLE,
+  '--format=esm', '--platform=node', '--target=es2019',
+  '--log-level=warning'], { stdio: 'inherit' });
+var cbs = await import(pathToFileURL(CB_BUNDLE).href);
+
+// Bundle tests/vectors.ts for the vector list.
+var V_BUNDLE = join(ROOT, '.esarr-vectors.bundle.mjs');
+execFileSync(process.execPath, [esbuildBin(), join(ROOT, 'vectors.ts'),
+  '--bundle', '--outfile=' + V_BUNDLE,
+  '--format=esm', '--platform=node', '--target=es2019',
+  '--log-level=warning'], { stdio: 'inherit' });
+var vecs = await import(pathToFileURL(V_BUNDLE).href);
+
+// ---- marker encode (JSON transport for NaN/Infinity/undefined) --------------
+function encode(v) {
+  if (v === void 0) { return '~Undef'; }
+  if (typeof v === 'number') {
+    if (v !== v) { return '~NaN'; }
+    if (v === Infinity) { return '~Inf'; }
+    if (v === -Infinity) { return '~NInf'; }
+    return v;
+  }
+  if (v === null || typeof v !== 'object') { return v; }
+  if (Array.isArray(v)) {
+    var a = [];
+    for (var i = 0; i < v.length; i++) { a[i] = encode(v[i]); }
+    return a;
+  }
+  var o = {};
+  for (var k in v) {
+    if (Object.prototype.hasOwnProperty.call(v, k)) { o[k] = encode(v[k]); }
+  }
+  return o;
+}
+
+var runVector = cbs.runVector;
+
+// ---- compute Node-side expected results -------------------------------------
+var vectors = vecs.VECTORS;
+var nodeResults = [];
+for (var vi = 0; vi < vectors.length; vi++) {
+  var vv = vectors[vi];
+  if (typeof core[vv.op] !== 'function') {
+    nodeResults[nodeResults.length] = { pending: true, op: vv.op };
+    continue;
+  }
+  var r = runVector(vv, core);
+  nodeResults[nodeResults.length] = { pending: false, op: vv.op, ok: r.ok, result: r.result, state: r.state };
+}
+
+// ---- emit the engine probe ---------------------------------------------------
+var probeDir = join(process.env.TEMP || '', 'esarr-live');
+mkdirSync(probeDir, { recursive: true });
+var probePath = join(probeDir, 'esarr-live-battery.jsx');
+var probeCorePath = join(probeDir, 'esarr-probe-core.jsx');
+
+// Bundle the glue (callbacks.ts + probe-glue.ts) into a single IIFE.
+execFileSync(process.execPath, [esbuildBin(), join(ROOT, 'probe-glue.ts'),
+  '--bundle', '--outfile=' + probeCorePath,
+  '--format=iife', '--global-name=PROBECORE', '--platform=neutral', '--target=es5',
+  '--log-level=warning'], { stdio: 'inherit' });
+
+var vendorForProbe = VENDOR.replace(/\\/g, '/');
+var coreForProbe = probeCorePath.replace(/\\/g, '/');
+var vectorsJson = JSON.stringify(encode(vectors));
+// Native DLL discovery: the FINAL wire is byte+1 = ESARRArray.dll
+// (decisions/wire-final v3) — the canonical optimized build (ESARRArray3
+// was the pre-promotion name; ESARRArray2 was the SUPERSEDED nibble build,
+// deleted). The gate probes each candidate and engages the first that
+// certifies.
+var nativeDir = join(PROJECT, 'native', 'bin').replace(/\\/g, '/');
+var nativeCandidates = JSON.stringify(['ESARRArray']);
+
+var probeSrc = [
+  '#target illustrator',
+  '// generated by tests/esarr-live-verify.mjs - do not edit',
+  '$.evalFile(File("' + vendorForProbe + '"));',
+  '$.evalFile(File("' + coreForProbe + '"));',
+  '// Force-replace so THIS bundle is what the wrapper tests exercise.',
+  'ESARR.install({ forceReplace: true });',
+  'var esarrVectors = ' + vectorsJson + ';',
+  'function esarrRunVecs() {',
+  '  var out = [];',
+  '  var i, esarrV, esarrR;',
+  '  for (i = 0; i < esarrVectors.length; i++) {',
+  '    esarrV = esarrVectors[i];',
+  '    if (typeof ESARR[esarrV.op] !== "function") {',
+  '      out[out.length] = { desc: esarrV.desc, op: esarrV.op, pending: true };',
+  '      continue;',
+  '    }',
+  '    $.global.esarrLast = esarrV.desc;',
+  '    try {',
+  '      esarrR = PROBECORE.runVec(esarrV, ESARR);',
+  '      out[out.length] = { desc: esarrV.desc, op: esarrV.op, pending: false, ok: esarrR.ok, result: esarrR.result, state: esarrR.state };',
+  '    } catch (e) {',
+  '      out[out.length] = { desc: esarrV.desc, op: esarrV.op, pending: false, ok: false, result: "ENGINE THREW: " + String(e) };',
+  '    }',
+  '  }',
+  '  return out;',
+  '}',
+  'var esarrJsx = esarrRunVecs();',
+  '// Native-gate pass: only when a DLL is loadable AND certifies (no-op otherwise).',
+  'var esarrNativePass = null;',
+  'var esarrGateCaps = null;',
+  'if (typeof ESARR.enableNativeGate === "function") {',
+  '  var esarrDllDir = "' + nativeDir + '";',
+  '  var esarrCands = ' + nativeCandidates + ';',
+  '  for (var esarrCi = 0; esarrCi < esarrCands.length; esarrCi++) {',
+  '    try {',
+  '      esarrGateCaps = ESARR.enableNativeGate({ dir: esarrDllDir, libName: esarrCands[esarrCi] });',
+  '      if (esarrGateCaps && esarrGateCaps.enabled) {',
+  '        esarrNativePass = esarrRunVecs();',
+  '        break;',
+  '      }',
+  '    } catch (e3) {',
+  '      esarrGateCaps = { enabled: false, reason: String(e3) };',
+  '    }',
+  '  }',
+  '  try { ESARR.disableNativeGate(); } catch (e2) {}',
+  '}',
+  'var esarrProto = Array.prototype;',
+  'function esarrWrapProbe() {',
+  '  var w = {};',
+  '  try { w.reduceAbsent = [1,2,3].reduce(function (a, b) { return a + b; }); } catch (e) { w.reduceAbsent = "ERR " + e; }',
+  '  try { w.reduceInit = [1,2,3].reduce(function (a, b) { return a + b; }, 10); } catch (e) { w.reduceInit = "ERR " + e; }',
+  '  try { w.lastIdxAbsent = [1,2,3].lastIndexOf(2); } catch (e) { w.lastIdxAbsent = "ERR " + e; }',
+  '  try { w.lastIdxUndef = [1,2,3].lastIndexOf(2, void 0); } catch (e) { w.lastIdxUndef = "ERR " + e; }',
+  '  try { w.indexOf = [1,2,3].indexOf(2); } catch (e) { w.indexOf = "ERR " + e; }',
+  '  try { w.forEachThis = (function () { var seen = ""; [1,2].forEach(function (v, i) { seen += (this === w && v) + ","; }, w); return seen; })(); } catch (e) { w.forEachThis = "ERR " + e; }',
+  '  try { w.findThis = (function () { var seen = ""; [1,2].find(function (v, i) { seen += (this === w && v) + ","; return false; }, w); return seen; })(); } catch (e) { w.findThis = "ERR " + e; }',
+  '  try { w.flatMapThis = (function () { var seen = ""; [1,2].flatMap(function (v, i) { seen += (this === w && v) + ","; return [v]; }, w); return seen; })(); } catch (e) { w.flatMapThis = "ERR " + e; }',
+  '  try { w.fromThis = (function () { var seen = ""; Array.from([1,2], function (v, i) { seen += (this === w && v) + ","; return v; }, w); return seen; })(); } catch (e) { w.fromThis = "ERR " + e; }',
+  '  try { w.sortDecimal = [10,9,1,2].sort().join(","); } catch (e) { w.sortDecimal = "ERR " + e; }',
+  '  try { w.isArrayArr = Array.isArray([]); } catch (e) { w.isArrayArr = "ERR " + e; }',
+  '  try { w.isArrayArgs = Array.isArray(arguments); } catch (e) { w.isArrayArgs = "ERR " + e; }',
+  '  try { w.sparseMap = JSON.stringify([1,,3].map(function (x) { return x * 2; })); } catch (e) { w.sparseMap = "ERR " + e; }',
+  '  try { w.sparseLiteralIn = 1 in [1,,3]; } catch (e) { w.sparseLiteralIn = "ERR " + e; }',
+  '  try { w.sparseForEach = (function () { var n = 0; [1,,3].forEach(function () { n++; }); return n; })(); } catch (e) { w.sparseForEach = "ERR " + e; }',
+  '  try { w.emptyReduce = (function () { try { return [].reduce(function (a, b) { return a + b; }); } catch (e) { return "TypeError"; } })(); } catch (e) { w.emptyReduce = "ERR " + e; }',
+  '  return w;',
+  '}',
+  'var esarrExtras = esarrWrapProbe();',
+  'esarrExtras.capsAfter = ESARR.capabilities();',
+  'try { ESARR.install(); esarrExtras.installAgain = "ok"; } catch (e) { esarrExtras.installAgain = "ERR " + e; }',
+  'try { ESARR.install({ forceReplace: true }); esarrExtras.forceReplace = "ok"; } catch (e) { esarrExtras.forceReplace = "ERR " + e; }',
+  'var esarrCls = {};',
+  'esarrCls.array = [].__class__;',
+  'esarrCls.args = (function () { return arguments; })(1, 2).__class__;',
+  'esarrCls.stringObj = Object("ab").__class__;',
+  'try { esarrCls.collection = app.documents.__class__; } catch (e) { esarrCls.collection = "ERR " + e; }',
+  'try { esarrCls.documentsLen = app.documents.length; } catch (e) { esarrCls.documentsLen = "ERR " + e; }',
+  'esarrCls.isArrayCollection = Array.isArray(app.documents);',
+  'var esarrReport = { engine: $.version, host: app.name + " " + app.version, results: esarrJsx, "native": esarrNativePass, gateCaps: esarrGateCaps, extras: esarrExtras, cls: esarrCls };',
+  'esarrReport;'
+].join('\n');
+writeFileSync(probePath, probeSrc);
+
+// ---- run through the COM tool -----------------------------------------------
+// Ensure an automation instance first (the tool's eval mode does not
+// auto-launch; espack-e2e uses status --launch for the same reason). The
+// cross-agent lock serializes; the caller should announce on instances/active.
+console.log('live-verify: ensuring an Illustrator automation instance...');
+try {
+  var launchOut = execFileSync('python', [TOOL, 'status', '--launch'], {
+    encoding: 'utf8', timeout: 180000
+  });
+  var launchEnv = JSON.parse(launchOut.trim());
+  if (!launchEnv.ok) {
+    console.error('live-verify: instance launch failed: ' + JSON.stringify(launchEnv).slice(0, 800));
+    process.exit(1);
+  }
+  console.log('live-verify: instance ' + (launchEnv.result ? launchEnv.result.Version : '?') + ' ready');
+} catch (e) {
+  console.error('live-verify: instance launch failed: ' + String((e.stdout || e.message) + '').slice(0, 800));
+  process.exit(1);
+}
+console.log('live-verify: running ' + vectors.length + ' vectors in Illustrator (JSX pass + native pass if a DLL certifies)...');
+var pyOut;
+try {
+  pyOut = execFileSync('python', [TOOL, 'eval', '--file', probePath.replace(/\\/g, '/')], {
+    encoding: 'utf8', timeout: 600000
+  });
+} catch (e) {
+  console.error('live-verify: COM tool failed: ' + String((e.stdout || e.message) + '').slice(0, 2000));
+  process.exit(1);
+}
+
+var env;
+try {
+  env = JSON.parse(pyOut.trim());
+} catch (e) {
+  console.error('live-verify: tool output not JSON: ' + pyOut.slice(0, 500));
+  process.exit(1);
+}
+if (!env.ok) {
+  console.error('live-verify: tool/engine error: ' + JSON.stringify(env).slice(0, 1500));
+  process.exit(1);
+}
+var report;
+if (env.result && typeof env.result.path === 'string' && env.result.path.length > 0) {
+  // result too large to round-trip inline — the tool spilled it to a JSON file
+  var spill = readFileSync(env.result.path, 'utf8');
+  try {
+    report = JSON.parse(spill);
+  } catch (e) {
+    console.error('live-verify: spill file not JSON: ' + spill.slice(0, 500));
+    process.exit(1);
+  }
+} else if (env.result && env.result.result) {
+  report = env.result.result;
+} else {
+  console.error('live-verify: tool/engine error: ' + JSON.stringify(env).slice(0, 1500));
+  process.exit(1);
+}
+
+// ---- compare engine results against Node core results -------------------------
+var failures = 0;
+var pendingEngine = 0;
+var pendingNode = 0;
+for (var i = 0; i < vectors.length; i++) {
+  var got = report.results[i];
+  var want = nodeResults[i];
+  if (got.pending) {
+    pendingEngine++;
+    if (!want.pending) {
+      failures++;
+      console.error('  FAIL ' + got.desc + ': engine reports op ' + got.op + ' missing, Node has it');
+    }
+    continue;
+  }
+  if (want.pending) {
+    pendingNode++;
+    continue;
+  }
+  var gotJ = JSON.stringify(got.result);
+  var wantJ = JSON.stringify(want.result);
+  var ok = got.ok === want.ok && gotJ === wantJ &&
+    JSON.stringify(got.state) === JSON.stringify(want.state);
+  if (!ok) {
+    // Same carve-out policy as the Node differential (callbacks.ts
+    // carveOutAccept): D7 — sort/toSorted with the non-transitive dCmp
+    // comparator on NaN/mixed-type inputs is implementation-defined
+    // (ES5.1 §15.4.4.11); any permutation of the input is valid. The engine
+    // and Node may pick different valid orders; both are spec-permitted.
+    var wanted = { ok: want.ok, result: want.result, state: want.state };
+    var gotted = { ok: got.ok, result: got.result, state: got.state };
+    if (cbs.carveOutAccept(vectors[i], gotted, wanted)) { continue; }
+    failures++;
+    console.error('  FAIL ' + got.desc + ': engine=' + gotJ + ' (state ' + JSON.stringify(got.state) + ') node=' + wantJ + ' (state ' + JSON.stringify(want.state) + ')');
+  }
+}
+console.log('live-verify: ' + (vectors.length - failures - pendingEngine - pendingNode) + '/' + vectors.length +
+  ' vectors match in engine ' + report.engine + ' (pending engine ' + pendingEngine + ', pending node ' + pendingNode + ')');
+
+// ---- native-gate pass comparison (byte-identical JSX vs native) --------------
+var gateFailures = 0;
+if (report.native) {
+  console.log('live-verify: native gate ENABLED — ' + report.gateCaps.lanes.length + ' lanes certified (' +
+    report.gateCaps.lanes.join(',') + '), comparing native pass vs JSX pass...');
+  for (var ni = 0; ni < vectors.length; ni++) {
+    var gj = report.results[ni];
+    var gn = report.native[ni];
+    if (gj.pending || gn.pending) { continue; }
+    if (JSON.stringify(gj.result) !== JSON.stringify(gn.result) ||
+      JSON.stringify(gj.state) !== JSON.stringify(gn.state)) {
+      gateFailures++;
+      console.error('  FAIL [native-vs-jsx] ' + gj.desc + ': jsx=' + JSON.stringify(gj.result) + ' native=' + JSON.stringify(gn.result));
+    }
+  }
+  if (gateFailures > 0) {
+    console.error('live-verify: native pass diverges from JSX pass on ' + gateFailures + ' vector(s)');
+  } else {
+    console.log('live-verify: native pass byte-identical to JSX pass on all vectors');
+  }
+} else {
+  console.log('live-verify: native gate NOT engaged (' + (report.gateCaps ? report.gateCaps.reason || 'no lanes certified' : 'gate API absent') + ') — JSX-only pass');
+}
+
+// ---- extras checks ------------------------------------------------------------
+var extraFailures = 0;
+function x(name, got, want) {
+  var g = JSON.stringify(got);
+  var w = JSON.stringify(want);
+  if (g === w) {
+    console.log('  ok   ' + name + ' = ' + g);
+  } else {
+    extraFailures++;
+    console.error('  FAIL ' + name + ': engine=' + g + ' expected=' + w);
+  }
+}
+x('reduceAbsent', report.extras.reduceAbsent, 6);
+x('reduceInit', report.extras.reduceInit, 16);
+x('lastIdxAbsent', report.extras.lastIdxAbsent, 1);
+x('lastIdxUndef (spec: undefined fromIndex -> +0)', report.extras.lastIdxUndef, -1);
+x('indexOf', report.extras.indexOf, 1);
+x('forEachThis', report.extras.forEachThis, '1,2,');
+x('findThis', report.extras.findThis, '1,2,');
+x('flatMapThis', report.extras.flatMapThis, '1,2,');
+x('fromThis', report.extras.fromThis, '1,2,');
+x('sortDecimal (ToString order [1,10,2,9])', report.extras.sortDecimal, '1,10,2,9');
+x('isArrayArr', report.extras.isArrayArr, true);
+x('isArrayArgs', report.extras.isArrayArgs, false);
+x('sparseMap (holes preserved)', report.extras.sparseMap, '[2,null,6]');
+x('sparseLiteralIn (elisions normalized in engine)', report.extras.sparseLiteralIn, true);
+x('sparseForEach (literal "holes" are visited)', report.extras.sparseForEach, 3);
+x('emptyReduce throws TypeError', report.extras.emptyReduce, 'TypeError');
+x('installAgain', report.extras.installAgain, 'ok');
+x('forceReplace', report.extras.forceReplace, 'ok');
+if (report.extras.capsAfter && report.extras.capsAfter.missing) {
+  x('capsAfter.missing empty (all 43 present after install)', report.extras.capsAfter.missing.length, 0);
+}
+
+console.log('engine quirks probe:');
+console.log('  __class__ array=' + JSON.stringify(report.cls.array) +
+  ' args=' + JSON.stringify(report.cls.args) +
+  ' stringObj=' + JSON.stringify(report.cls.stringObj) +
+  ' collection=' + JSON.stringify(report.cls.collection));
+console.log('  documents.length = ' + JSON.stringify(report.cls.documentsLen));
+console.log('  Array.isArray(app.documents) = ' + JSON.stringify(report.cls.isArrayCollection));
+
+if (failures > 0 || extraFailures > 0 || gateFailures > 0) {
+  console.error('live-verify: ' + failures + ' vector failure(s), ' + extraFailures + ' extra failure(s), ' + gateFailures + ' gate failure(s)');
+  process.exit(1);
+}
+console.log('live-verify: all vectors + wrappers verified in the live engine');
+
+function esbuildBin() {
+  var direct = join(PROJECT, 'node_modules', 'esbuild', 'bin', 'esbuild');
+  if (existsSync(direct)) { return direct; }
+  var cacheDirs = [
+    join(process.env.LOCALAPPDATA || '', 'npm-cache', '_npx'),
+    join(process.env.USERPROFILE || '', 'AppData', 'Local', 'npm-cache', '_npx')
+  ];
+  for (var c = 0; c < cacheDirs.length; c++) {
+    try {
+      var entries = readdirSync(cacheDirs[c]);
+      for (var j = 0; j < entries.length; j++) {
+        var p = join(cacheDirs[c], entries[j], 'node_modules', 'esbuild', 'bin', 'esbuild');
+        if (existsSync(p)) { return p; }
+      }
+    } catch (ignore) {}
+  }
+  return 'npx esbuild';
+}

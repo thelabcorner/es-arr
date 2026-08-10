@@ -1,0 +1,93 @@
+{
+ "engine": "4.5.6",
+ "host": "Adobe Illustrator 30.6.0",
+ "sizes": [
+  8192
+ ],
+ "reps": 9,
+ "warm": 2,
+ "lane": "scan",
+ "dllOk": true,
+ "rows": [
+  {
+   "lane": "miss-value",
+   "v": 2147483647,
+   "u": "int"
+  },
+  {
+   "lane": "jsx-indexOf-miss",
+   "v": 48167,
+   "u": "us"
+  },
+  {
+   "lane": "jsx-indexOf-hitfirst",
+   "v": 8,
+   "u": "us"
+  },
+  {
+   "lane": "jsx-indexOf-hitlast",
+   "v": 49471,
+   "u": "us"
+  },
+  {
+   "lane": "jsx-lastIndexOf-miss",
+   "v": 49626,
+   "u": "us"
+  },
+  {
+   "lane": "jsx-includes-miss",
+   "v": 49304,
+   "u": "us"
+  },
+  {
+   "lane": "pack-only",
+   "v": 82878,
+   "u": "us"
+  },
+  {
+   "lane": "packscan-indexOf-miss",
+   "v": 325,
+   "u": "us"
+  },
+  {
+   "lane": "packscan-indexOf-hitfirst",
+   "v": 337,
+   "u": "us"
+  },
+  {
+   "lane": "packscan-indexOf-hitlast",
+   "v": 341,
+   "u": "us"
+  },
+  {
+   "lane": "packscan-lastIndexOf-miss",
+   "v": 331,
+   "u": "us"
+  },
+  {
+   "lane": "packscan-includes-miss",
+   "v": 325,
+   "u": "us"
+  },
+  {
+   "lane": "packscan-includes-hitfirst",
+   "v": 328,
+   "u": "us"
+  },
+  {
+   "lane": "correct-idx",
+   "v": 1,
+   "u": "bool"
+  },
+  {
+   "lane": "correct-idx-last",
+   "v": 1,
+   "u": "bool"
+  },
+  {
+   "lane": "correct-includes",
+   "v": 1,
+   "u": "bool"
+  }
+ ]
+}

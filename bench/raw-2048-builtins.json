@@ -1,0 +1,117 @@
+{
+ "engine": "4.5.6",
+ "host": "Adobe Illustrator 30.6.0",
+ "sizes": [
+  2048
+ ],
+ "reps": 9,
+ "warm": 2,
+ "group": "builtins",
+ "rows": [
+  {
+   "lane": "slice-full",
+   "builtin": 2927,
+   "esarr": -1,
+   "mdn": -1,
+   "hand": 3302
+  },
+  {
+   "lane": "slice-half",
+   "builtin": 650,
+   "esarr": -1,
+   "mdn": -1,
+   "hand": 803
+  },
+  {
+   "lane": "concat-2",
+   "builtin": 9292,
+   "esarr": -1,
+   "mdn": -1,
+   "hand": 11084
+  },
+  {
+   "lane": "join-comma",
+   "builtin": 2193,
+   "esarr": -1,
+   "mdn": -1,
+   "hand": 6284
+  },
+  {
+   "lane": "toString",
+   "builtin": 1911,
+   "esarr": -1,
+   "mdn": -1,
+   "hand": 6126
+  },
+  {
+   "lane": "push-build",
+   "builtin": 3824,
+   "esarr": -1,
+   "mdn": -1,
+   "hand": 2331
+  },
+  {
+   "lane": "pop-drain",
+   "builtin": 4351,
+   "esarr": -1,
+   "mdn": -1,
+   "hand": 391
+  },
+  {
+   "lane": "shift-drain",
+   "builtin": 706573,
+   "esarr": -1,
+   "mdn": -1,
+   "hand": 2284057
+  },
+  {
+   "lane": "unshift-build",
+   "builtin": 689016,
+   "esarr": -1,
+   "mdn": -1,
+   "hand": 1193245
+  },
+  {
+   "lane": "splice-mid",
+   "builtin": 364,
+   "esarr": -1,
+   "mdn": -1,
+   "hand": 1295
+  },
+  {
+   "lane": "splice-half",
+   "builtin": 2310,
+   "esarr": -1,
+   "mdn": -1,
+   "hand": 1826
+  },
+  {
+   "lane": "sort-cmp",
+   "builtin": 849122,
+   "esarr": -1,
+   "mdn": -1,
+   "hand": 1368255
+  },
+  {
+   "lane": "sort-default",
+   "builtin": 7961,
+   "esarr": -1,
+   "mdn": -1,
+   "hand": -1
+  },
+  {
+   "lane": "reverse",
+   "builtin": 911,
+   "esarr": -1,
+   "mdn": -1,
+   "hand": 2792
+  },
+  {
+   "lane": "read-scan",
+   "builtin": -1,
+   "esarr": -1,
+   "mdn": -1,
+   "hand": 1743
+  }
+ ]
+}

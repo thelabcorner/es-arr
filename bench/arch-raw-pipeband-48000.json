@@ -1,0 +1,33 @@
+{
+ "engine": "4.5.6",
+ "host": "Adobe Illustrator 30.6.0",
+ "sizes": [
+  48000
+ ],
+ "reps": 3,
+ "warm": 2,
+ "lane": "pipeband",
+ "dllOk": true,
+ "rows": [
+  {
+   "lane": "pipe-engine",
+   "v": 7832301,
+   "u": "us"
+  },
+  {
+   "lane": "pipe-packonce",
+   "v": 3859848,
+   "u": "us"
+  },
+  {
+   "lane": "pipe-percall",
+   "v": 12191438,
+   "u": "us"
+  },
+  {
+   "lane": "dll-ok",
+   "v": 1,
+   "u": "bool"
+  }
+ ]
+}
