@@ -254,10 +254,10 @@ function espackManifest(bundleName, payloadDll, payloadName, payloadVersion, acc
     var accelBytes = readFileSync(accelDll);
     accel = {
       name: 'ESB64Native',
-      version: '1',
+      version: '2',
       len: accelBytes.length,
       b64: accelBytes.toString('base64'),
-      fileName: 'ESB64Native_v1.dll'
+      fileName: 'ESB64Native_v2.dll'
     };
   }
   return {
@@ -283,7 +283,7 @@ function buildAccel() {
     return;
   }
   var accelBundle = join(DIST, '.esarr-accel-bundle.jsx');
-  execFileSync(process.execPath, [espackBuild, '--embed', dll, '--out', accelBundle,
+  execFileSync(process.execPath, [espackBuild, '--embed', dll, '--accel-version', '2', '--out', accelBundle,
     '--name', 'esarr', '--quiet'], { stdio: 'inherit' });
   var bundleText = readFileSync(accelBundle, 'utf8');
   var facadeText = readFileSync(join(DIST, 'ESARR.jsx'), 'utf8');
