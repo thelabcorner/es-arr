@@ -252,6 +252,18 @@ if (env.result && typeof env.result.path === 'string' && env.result.path.length 
   process.exit(1);
 }
 
+// ---- checkpoint: persist the raw engine report immediately (crash-resilient) ---
+var CHECKPOINT_DIR = join(PROJECT, 'docs', 'verification-checkpoints');
+try {
+  mkdirSync(CHECKPOINT_DIR, { recursive: true });
+  var stamp = new Date().toISOString().replace(/[:.]/g, '-');
+  writeFileSync(join(CHECKPOINT_DIR, 'live-' + stamp + '.json'),
+    JSON.stringify({ vectors: vectors.length, engine: report.engine, host: report.host, report: report }, null, 1));
+  console.log('live-verify: checkpoint written (live-' + stamp + '.json)');
+} catch (e) {
+  console.log('live-verify: checkpoint write failed: ' + String(e));
+}
+
 // ---- compare engine results against Node core results -------------------------
 var failures = 0;
 var pendingEngine = 0;

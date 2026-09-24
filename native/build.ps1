@@ -17,6 +17,10 @@ param(
 
 $ErrorActionPreference = "Stop"
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
+$esabiInclude = Join-Path $here "..\deps\esabi\include"
+if (-not (Test-Path (Join-Path $esabiInclude "esabi\esabi.h"))) {
+    throw "ESABI dependency missing. Run: git submodule update --init --recursive"
+}
 
 function Find-VsDevCmd {
     $candidates = @(
@@ -83,7 +87,7 @@ if ($clang -and $lld -and (Test-Path $clang) -and (Test-Path $lld)) {
     Write-Output "ESARRArray build: clang+lld (freestanding, x86-64-v2, -O3 -flto)"
     & $clang --target=x86_64-pc-windows-msvc -O3 -ffast-math -ffreestanding `
         -fno-stack-protector -mno-stack-arg-probe -fno-builtin `
-        -march=x86-64-v2 -mtune=generic -flto @incPaths -c "$src" -o "$obj"
+        -march=x86-64-v2 -mtune=generic -flto "-I$esabiInclude" @incPaths -c "$src" -o "$obj"
     if ($LASTEXITCODE -ne 0) { throw "clang failed with exit $LASTEXITCODE" }
     & $lld -flavor link /dll /entry:DllMain /subsystem:windows /nodefaultlib `
         /machine:x64 /timestamp:0 /out:"$out" "$obj" @libPaths kernel32.lib
@@ -91,7 +95,7 @@ if ($clang -and $lld -and (Test-Path $clang) -and (Test-Path $lld)) {
     $built = $true
 } elseif (Get-Command cl -ErrorAction SilentlyContinue) {
     Write-Output "ESARRArray build: MSVC fallback (freestanding, /nodefaultlib)"
-    & cl /nologo /O2 /GS- /c "$src" /Fo:"$obj"
+    & cl /nologo /O2 /GS- /I"$esabiInclude" /c "$src" /Fo:"$obj"
     if ($LASTEXITCODE -ne 0) { throw "cl failed with exit $LASTEXITCODE" }
     & link /dll /nodefaultlib /entry:DllMain /subsystem:windows /machine:x64 `
         /Brepro /out:"$out" "$obj" @libPaths kernel32.lib

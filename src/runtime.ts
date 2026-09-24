@@ -8,4 +8,4 @@ export { indexOf, lastIndexOf, includes, join, reverse, sort } from './native-di
 export { concat, pop, push, shift, slice, splice, toString, unshift } from './array-es3';
 export { at, copyWithin, entries, fill, find, findIndex, findLast, findLastIndex,
   flat, flatMap, from, keys, of, toReversed, toSorted, values,
-  withMethod as with } from './array-es6';
+  withMethod } from './array-es6';

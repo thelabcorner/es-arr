@@ -17,7 +17,7 @@ ESARR becomes an **entire polyfill for the whole Array object** — ES3
 built-ins + ES5 set + ES6+ set — with **native-backed lanes where the
 measured engine behavior says they win**. The hard boundary: **the DLL
 cannot read or write JS arrays**; all bulk traffic is the packed-string
-channel (`kTypeString`, UTF-8), scalar arguments are numbers/strings.
+channel (`ESABI_TYPE_STRING`, UTF-8), scalar arguments are numbers/strings.
 
 The decisive measured facts (this document's evidence base):
 
@@ -29,7 +29,7 @@ The decisive measured facts (this document's evidence base):
 | Packing loop **wedges the engine at ≥ ~64k elements** (≥131k `fromCharCode` units) | reproduced twice; hard hang, process restart |
 | The engine's OWN built-ins are pathologically slow on large dense arrays | **sort 32k = 6.9 s, reverse 32k = 5.1 s, join 32k = 1.3 s** (random int32) |
 | The engine does NOT escape the slow access machinery — its built-ins pay it too | sort/join/reverse all superlinear in n (4× size → 19-25× cost) |
-| kTypeScript (tag 125) is fine ≤ ~2k, superlinear beyond | 0.39 ms @256, 1.8 ms @2048; unusable for bulk |
+| ESABI_TYPE_SCRIPT (tag 125) is fine ≤ ~2k, superlinear beyond | 0.39 ms @256, 1.8 ms @2048; unusable for bulk |
 | Packed-string channel round-trips byte-exact through a real DLL | ESChars.dll `packBytes`/`unpackBytes`: 8k AND 64k elements, 0 mismatches |
 | Boundary cost is small | per-call fixed ~0-2 µs; native pack/unpack ~0.2-0.4 ms @8k, ~2-3 ms @64k |
 
@@ -65,17 +65,17 @@ never depends on the DLL.
 
 ### 1.1 Mandatory exports (family pattern, esb64/eschars-verified)
 
+The native boundary is defined by the pinned **ESABI v0.3.0** dependency (`deps/esabi`). Production code does not redeclare `TaggedData` or vendor Adobe's historical ABI header.
+
 ```c
-ESInitialize(TaggedData* argv, long argc) -> signature string (see 1.2)
-ESGetVersion(void) -> 1
-ESFreeMem(void* p)  -> free of DLL-owned strings (own pool, esb64 pattern)
-ESTerminate(void)   -> no-op (no persistent state)
+ESABI_INITIALIZE_FUNCTION   /* signature string; see 1.2 */
+ESABI_VERSION_FUNCTION      /* returns 1 */
+ESABI_FREE_FUNCTION         /* frees DLL-owned strings */
+ESABI_TERMINATE_FUNCTION    /* no persistent state */
+ESABI_DIRECT_FUNCTION(name) /* every business method */
 ```
 
-Every method: `long fn(TaggedData* argv, long argc, TaggedData* retval)`.
-8-byte pack alignment; `retval` zeroed before writing; positive custom
-errors `>= 10000` only — **never negative codes** (fatal/uncatchable).
-Returned strings are DLL-malloc'd UTF-8, freed by the host via `ESFreeMem`.
+On Windows, ESABI selects its verified LONG32 profile: `esabi_value` is 16 bytes with 8-byte alignment, the type tag at byte 8, and the reserved field at byte 12. Positive custom errors `>= 10000` only — **never negative codes** (fatal/uncatchable). Returned strings are DLL-allocated UTF-8 and freed by the host through `ESFreeMem`.
 
 Build: freestanding clang+lld (`-O3 -ffreestanding -fno-builtin
 -march=x86-64-v2 -flto`, `/nodefaultlib /entry:DllMain /timestamp:0`) with
@@ -91,7 +91,7 @@ after every build (per-DLL-build binding flakiness is real).
 "arrSort_sd,arrReverse_sd,arrJoin_sds,arrIndexOf_sdd,arrLastIndexOf_sdd,arrIncludes_sdd,ping_d,version_s"
 ```
 
-- `_s` = string arg, `_d` = int32 arg (host casts to `kTypeInteger`).
+- `_s` = string arg, `_d` = int32 arg (host delivers `ESABI_TYPE_INTEGER`).
 - Method names with a bare name are avoided (POC found no-arg methods
   unreliable) — every method takes at least a dummy `_d` where needed;
   here all methods are naturally parameterized.
@@ -109,14 +109,14 @@ payload** (see below).
 
 | Export | Args | Returns | Semantics |
 |---|---|---|---|
-| `ping_d` | dummy | `kTypeInteger` 42 | load/binding smoke |
-| `version_s` | dummy | `kTypeString` | family-style banner (optional) |
+| `ping_d` | dummy | `ESABI_TYPE_INTEGER` 42 | load/binding smoke |
+| `version_s` | dummy | `ESABI_TYPE_STRING` | family-style banner (optional) |
 | `arrSort_sd` | packed, len | packed | **default-comparator sort** in ES ToString order (§4): decode int32, format each to decimal, lexicographic compare. NOT required to be stable (ES allows non-stable). |
 | `arrReverse_sd` | packed, len | packed | reverse element order |
-| `arrJoin_sds` | packed, len, sep | `kTypeString` | decimal-format each + `sep` join (sep is an arbitrary JS string) |
-| `arrIndexOf_sdd` | packed, len, search | `kTypeInteger` | first index of `search` (int32 `===`) within the slice, or -1 (0-based; NaN can never match an int32 payload). |
-| `arrLastIndexOf_sdd` | packed, len, search | `kTypeInteger` | last index within the slice scanning DOWN from `len-1`, or -1. |
-| `arrIncludes_sdd` | packed, len, search | `kTypeInteger` | 1 if present in the slice else 0 (SameValueZero; for int32 payloads identical to `===`; `-0`/`0` compare equal, matching ES). |
+| `arrJoin_sds` | packed, len, sep | `ESABI_TYPE_STRING` | decimal-format each + `sep` join (sep is an arbitrary JS string) |
+| `arrIndexOf_sdd` | packed, len, search | `ESABI_TYPE_INTEGER` | first index of `search` (int32 `===`) within the slice, or -1 (0-based; NaN can never match an int32 payload). |
+| `arrLastIndexOf_sdd` | packed, len, search | `ESABI_TYPE_INTEGER` | last index within the slice scanning DOWN from `len-1`, or -1. |
+| `arrIncludes_sdd` | packed, len, search | `ESABI_TYPE_INTEGER` | 1 if present in the slice else 0 (SameValueZero; for int32 payloads identical to `===`; `-0`/`0` compare equal, matching ES). |
 
 **Canonical scan contract (adopted 2026-08-09 — supersedes the earlier
 "fromIndex-as-arg" draft):** `arrIndexOf_sdd` / `arrLastIndexOf_sdd` /
@@ -173,7 +173,7 @@ the DLL has no input handle; the input is a fresh string per call anyway).
 | `10001` | payload/len mismatch or malformed payload |
 | `10002` | sep too long / internal arg error |
 | `10003` | allocator pool exhausted |
-| `20` | `kESErrBadArgumentList` (host-side) |
+| `20` | `ESABI_ERR_BAD_ARGUMENTS` (host-side) |
 
 Errors surface as `Error #` with `.number` — the JSX wrapper maps them to
 lane fallback (never a throw to the consumer).
@@ -182,8 +182,8 @@ lane fallback (never a throw to the consumer).
 
 - No array memory access (impossible by ABI).
 - No callbacks, no function args (impossible by ABI).
-- No kTypeScript returns (§3.5 — dead end for the sizes the lanes engage).
-- No `kTypeLiveObject`, no tag experiments (host destabilization).
+- No ESABI_TYPE_SCRIPT returns (§3.5 — dead end for the sizes the lanes engage).
+- No `ESABI_TYPE_LIVE_OBJECT`, no tag experiments (host destabilization).
 - No consumer-facing extras (no min/max/sum — not Array methods).
 
 ---
@@ -268,7 +268,7 @@ fallback is preserved because any doubt falls through to JSX.
 
 ### 3.1 The channel
 
-- All bulk traffic is a single `kTypeString` (UTF-8, NUL-terminated at the
+- All bulk traffic is a single `ESABI_TYPE_STRING` (UTF-8, NUL-terminated at the
   C boundary). Verified: ~360 KB+ per direction; NUL truncates; the
   surrogate window (code units 0xD800-0xDFFF) cannot cross.
 - The JSX side therefore packs numbers into a JS string whose code units
@@ -397,13 +397,13 @@ strings, which cannot be in an int32 payload).
 - JSX validates the returned payload length (and, for small results, spot
   values) before trusting it; any anomaly → JSX fallback (see §5.4).
 
-### 3.5 kTypeScript (tag 125) — measured, and rejected for the lanes
+### 3.5 ESABI_TYPE_SCRIPT (tag 125) — measured, and rejected for the lanes
 
 Microprototype (c): `charCodes` via ArcFitEso7 (real evaluated Array,
 byte-perfect): 256 ≈ 0.39 ms, 1024 ≈ 0.80 ms, 2048 ≈ 1.8 ms — **2.5×
 faster than packed+unpack at 1-2k**. But the cost is superlinear (verified
 by this probe + skill's earlier 16k ≈ 101-308 ms), and every native lane
-engages at large n where it is a dead end. **Conclusion:** kTypeScript is
+engages at large n where it is a dead end. **Conclusion:** ESABI_TYPE_SCRIPT is
 documented as a niche result transport for hypothetical small-n lanes
 (≤2k) only; the packed channel is the canonical result transport. It is
 also an eval of returned text — trust boundary — never used with
@@ -776,9 +776,9 @@ it is banned). Pack variants measured: direct `+=` 70 ms @8k, array+join
 **wedged the engine twice** (hard hang; process restart) — hard upper
 bound for native lanes ≈ 48k elements.
 
-### (c) kTypeScript for SMALL result arrays — USABLE ≤ 2k
+### (c) ESABI_TYPE_SCRIPT for SMALL result arrays — USABLE ≤ 2k
 
-| n | kTypeScript (charCodes) | packed+unpack | verdict |
+| n | ESABI_TYPE_SCRIPT (charCodes) | packed+unpack | verdict |
 |---|---|---|---|
 | 256 | 0.25-0.50 ms | 0.48-0.58 ms | parity |
 | 1024 | 0.64-1.02 ms | 2.04-2.19 ms | **kTS 2.6× faster** |
@@ -786,7 +786,7 @@ bound for native lanes ≈ 48k elements.
 
 Real evaluated Arrays (`instanceof Array`, byte-perfect). Superlinear:
 unusable beyond ~4k — and the native lanes engage only at ≥4k, so the
-packed channel remains the canonical result transport. kTypeScript is a
+packed channel remains the canonical result transport. ESABI_TYPE_SCRIPT is a
 documented niche for small-n lanes (none active).
 
 ### Engine baselines (random dense int32, medians)
@@ -813,7 +813,7 @@ than push — mandatory result pattern).
 
 - **NEVER** design a lane that needs callbacks or JS array memory across
   the boundary — it cannot work (ABI).
-- **NEVER** kTypeScript for bulk results; **NEVER** negative error codes;
+- **NEVER** ESABI_TYPE_SCRIPT for bulk results; **NEVER** negative error codes;
   **NEVER** tag experiments; **NEVER** multi-megabyte return strings.
 - **NEVER** the array+push+join pack pattern (2.3× slower, wedge-prone);
   **NEVER** pack lanes ≥ 64k elements in probes (wedge).

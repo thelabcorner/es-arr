@@ -38,7 +38,10 @@
 // `n<0 ? n+4294967296 : n` two's-complement temp. Byte-identical output,
 // -7.4% wire @32k (pack-v1 1071ms -> u8-fastshift 992ms, fresh instance).
 export function packInt32(v: number): string {
-  return String.fromCharCode(((v >>> 24) & 255) + 1, ((v >>> 16) & 255) + 1, ((v >>> 8) & 255) + 1, (v & 255) + 1);
+  // Types-for-Adobe declares fromCharCode with one parameter; the engine's
+  // varargs form is the hot path here (compile-time declaration-shape cast
+  // only, same pattern as ESB64).
+  return (String.fromCharCode as any)(((v >>> 24) & 255) + 1, ((v >>> 16) & 255) + 1, ((v >>> 8) & 255) + 1, (v & 255) + 1);
 }
 
 export function unpackInt32At(s: string, i: number): number {

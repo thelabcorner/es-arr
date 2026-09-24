@@ -1,23 +1,31 @@
 #!/usr/bin/env node
-// ESARR build: bundles the TypeScript core into
+// ESARR build — ESTC is the canonical ExtendScript emission path.
+//
 //   dist/ESARR.jsx                - bannerless IIFE (COM-eval / $.evalFile safe),
-//                                   defines var ESARR (the facade)
-//   dist/vendor-esarr.js          - production drop-in: facade + install footer
-//                                   that gap-fills the FULL Array surface
-//                                   (ES3 set + ES5 set + ES6+ set + statics)
-//                                   when absent (true polyfill)
-//   dist/vendor-esarr-runtime.js  - slim methods-only vendor (per-eval
-//                                   injection), same gap-fill footer
-//   dist/ESARR-runtime.jsx        - build intermediate (bare bundle, no shim,
-//                                   no footer - not standalone-loadable)
+//                                   defines var ESARR (the facade). ESTC build:
+//                                   src/index.ts -> ES3-normalized bundle with
+//                                   bundle-local esbuild helpers (no host-global
+//                                   mutation, no Function.prototype.bind shim).
+//   dist/vendor-esarr.js          - production drop-in: facade + installer footer
+//                                   (tooling/estc-vendor-footer.js) that gap-fills
+//                                   the FULL Array surface (ES3 set + ES5 set +
+//                                   ES6+ set + statics) when absent (true polyfill)
+//   dist/vendor-esarr-runtime.js  - slim methods-only vendor (per-eval injection),
+//                                   same gap-fill footer
+//   dist/ESARR-runtime.jsx        - build intermediate (bare bundle, no footer -
+//                                   not standalone-loadable)
 //   dist/esarr-core.esm.mjs       - ESM bundle of the core for Node harnesses
-//   dist/ESARR.accel.jsx          - (--accel) self-extracting single-file
-//                                   bundle: espack (ESARRArray.dll payload +
-//                                   shared esb64 accelerator) + ESARR facade +
-//                                   espack adapter (auto native-gate enable)
+//   dist/ESARR.accel.jsx          - (--accel) self-extracting single-file bundle:
+//                                   espack (ESARRArray.dll payload + the CURRENT
+//                                   ESTC-built esb64 runtime + shared ESB64Native
+//                                   accelerator) + ESARR facade + espack adapter
+//                                   (auto native-gate enable)
 //   dist/ESARR.accel.min.jsx      - (--accel) minified via the
 //                                   adobe-extendscript-minification skill
 //                                   (conservative config, banner preserved)
+//   dist/ESARR.manifest.json      - (--accel) espack merge-spec manifest sidecar
+//   dist/ESARR.facade.jsx         - (--accel) loader-free facade for espack-merge
+//                                   composers
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync, readdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
@@ -25,7 +33,15 @@ import { fileURLToPath } from 'node:url';
 
 var ROOT = dirname(fileURLToPath(import.meta.url));
 var DIST = join(ROOT, 'dist');
-var ENTRY = join(ROOT, 'src', 'index.ts');
+// ESM entry keeps the modern `with` named export (src/esm-entry.ts); the JSX
+// builds use src/index.ts, whose boundary-safe `withMethod` export plus the
+// facade-alias footer produce ESARR.with without a reserved export binding.
+var ESM_ENTRY = join(ROOT, 'src', 'esm-entry.ts');
+var ESTC = join(ROOT, '..', 'extendscript-toolchain', 'bin', 'estc.mjs');
+// Composition pins: the CURRENT ESTC-built esb64 runtime (never espack's stale
+// vendored copy) and the CURRENT sibling ESB64Native accelerator DLL.
+var ESB64_RUNTIME = join(ROOT, '..', 'esb64', 'dist', 'vendor-esb64-runtime.js');
+var ESB64_ACCEL = join(ROOT, '..', 'esb64', 'native', 'bin', 'ESB64Native.dll');
 
 function findEsbuild() {
   if (process.env.ESBUILD_PATH && existsSync(process.env.ESBUILD_PATH)) return process.env.ESBUILD_PATH;
@@ -55,152 +71,35 @@ function esmBuild(entry, outfile) {
   ], { stdio: 'inherit' });
 }
 
-function jsxBuild(entry, outfile) {
-  execFileSync(process.execPath, [
-    findEsbuild(), entry, '--bundle', '--outfile=' + outfile,
-    '--format=iife', '--global-name=ESARR', '--platform=neutral', '--target=es5',
-    '--log-level=warning'
-  ], { stdio: 'inherit' });
+function estcBuild(config) {
+  execFileSync(process.execPath, [ESTC, 'build', '--config', config], {
+    cwd: ROOT,
+    stdio: 'inherit'
+  });
 }
 
 mkdirSync(DIST, { recursive: true });
 
 // 1. ESM core bundle (Node harnesses import this).
-esmBuild(ENTRY, join(DIST, 'esarr-core.esm.mjs'));
+esmBuild(ESM_ENTRY, join(DIST, 'esarr-core.esm.mjs'));
 
-// 2. JSX bundle with the ES3 shim prepended. ExtendScript (SpiderMonkey 2014)
-//    lacks nothing esbuild's ES5 export helpers need here EXCEPT
-//    Function.prototype.bind on some hosts (probed present on 4.5.6); the
-//    shim below keeps the bundle loadable everywhere.
-var jsx = join(DIST, 'ESARR.jsx');
-jsxBuild(ENTRY, jsx);
+// 2. Canonical ExtendScript facade + vendors. ESTC owns ES3 normalization and
+//    keeps esbuild's helper compatibility bundle-local instead of mutating
+//    host globals; the gap-fill installer footer is a checked-in source
+//    (tooling/estc-vendor-footer.js) applied by the vendor builds.
+estcBuild('./extendscript.estc.config.mjs');
+estcBuild('./extendscript.vendor.estc.config.mjs');
+estcBuild('./extendscript.runtime.estc.config.mjs');
+estcBuild('./extendscript.runtime-vendor.estc.config.mjs');
 
-var shim = [
-  'if (typeof Function.prototype.bind !== "function") {',
-  '  Function.prototype.bind = function (thisArg) {',
-  '    var fn = this;',
-  '    var args = Array.prototype.slice.call(arguments, 1);',
-  '    return function () {',
-  '      return fn.apply(thisArg, args.concat(Array.prototype.slice.call(arguments)));',
-  '    };',
-  '  };',
-  '}',
-  ''
-].join('\n');
-
-// ES3-ification pass on the bundled IIFE: esbuild emits the export map with
-// unquoted keys (`with: function() {...}`), which is legal ES5 but an
-// ILLEGAL reserved-word object key in ExtendScript's ES3 parser — the bundle
-// would fail at eval ("SyntaxError: Illegal use of reserved word 'with'").
-// Quote the reserved-word export keys. The pure function is named
-// `withMethod`, so the only `with: function` occurrence is the export map.
-function es3ify(bundleText) {
-  return bundleText.replace(/\n(\s*)with: function/g, '\n$1"with": function');
-}
-
-var finalJsx = shim + readFileSync(jsx, 'utf8');
-finalJsx = finalJsx.replace(/"use strict";?/g, '');
-finalJsx = es3ify(finalJsx);
-writeFileSync(jsx, finalJsx);
-
-// 3. Generated full-surface gap-fill footer. Method table: [name, arity]:
-//    'plain'    -> wrapper forwards (a, b, c)
-//    'omit2'    -> 2nd argument omitted when absent (call-arity semantics:
-//                  reduce/reduceRight initialValue, lastIndexOf fromIndex)
-//    'variadic' -> wrapper forwards [this, ...arguments] via apply
-//    All property names use bracket notation ('with' is a reserved word in
-//    ES3 source). The ES3 native set (slice..toString) is skipped by the
-//    typeof guard when the host provides it (forceReplace overrides via
-//    ESARR.install). The ESARR facade is always available as the global
-//    `ESARR`.
-var METHODS = [
-  ['slice', 'plain'], ['concat', 'variadic'], ['join', 'plain'], ['push', 'variadic'],
-  ['pop', 'plain'], ['shift', 'plain'], ['unshift', 'variadic'], ['splice', 'variadic'],
-  ['sort', 'plain'], ['reverse', 'plain'], ['toString', 'plain'],
-  ['forEach', 'plain'], ['map', 'plain'], ['filter', 'plain'], ['every', 'plain'], ['some', 'plain'],
-  ['indexOf', 'plain'], ['lastIndexOf', 'omit2'], ['reduce', 'omit2'], ['reduceRight', 'omit2'],
-  ['find', 'plain'], ['findIndex', 'plain'], ['includes', 'plain'], ['at', 'plain'],
-  ['copyWithin', 'plain'], ['fill', 'plain'], ['flat', 'plain'], ['flatMap', 'plain'],
-  ['keys', 'plain'], ['values', 'plain'], ['entries', 'plain'], ['toSorted', 'plain'],
-  ['toReversed', 'plain'], ['with', 'plain'], ['findLast', 'plain'], ['findLastIndex', 'plain']
-];
-var STATICS = ['isArray', 'from', 'of'];
-
-function footerMethodLines(name, arity) {
-  var q = JSON.stringify(name);
-  if (arity === 'omit2') {
-    return [
-      '  if (typeof p[' + q + '] !== "function") {',
-      '    p[' + q + '] = function (a, b) {',
-      '      if (arguments.length > 1) { return ESARR[' + q + '](this, a, b); }',
-      '      return ESARR[' + q + '](this, a);',
-      '    };',
-      '  }'
-    ];
-  }
-  if (arity === 'variadic') {
-    return [
-      '  if (typeof p[' + q + '] !== "function") {',
-      '    p[' + q + '] = function () {',
-      '      var a = [this];',
-      '      var i = 0;',
-      '      for (i = 0; i < arguments.length; i++) { a[a.length] = arguments[i]; }',
-      '      return ESARR[' + q + '].apply(null, a);',
-      '    };',
-      '  }'
-    ];
-  }
-  return [
-    '  if (typeof p[' + q + '] !== "function") {',
-    '    p[' + q + '] = function (a, b, c) { return ESARR[' + q + '](this, a, b, c); };',
-    '  }'
-  ];
-}
-
-function buildFooter() {
-  var lines = [
-    '(function () {',
-    '  var g = null;',
-    '  try { if (typeof $ !== "undefined" && $.global) { g = $.global; } } catch (e1) {}',
-    '  if (!g) { try { g = (function () { return this; })(); } catch (e2) {} }',
-    '  if (!g || !g.Array || !g.Array.prototype) return;',
-    '  var p = g.Array.prototype;'
-  ];
-  var i = 0;
-  for (i = 0; i < METHODS.length; i++) {
-    lines = lines.concat(footerMethodLines(METHODS[i][0], METHODS[i][1]));
-  }
-  lines = lines.concat([
-    '  if (typeof g.Array.isArray !== "function") { g.Array.isArray = ESARR.isArray; }',
-    '  if (typeof g.Array.from !== "function") {',
-    '    g.Array.from = function (items, mf, ta) { return ESARR.from(items, mf, ta, this); };',
-    '  }',
-    '  if (typeof g.Array.of !== "function") { g.Array.of = ESARR.of; }',
-    '})();',
-    ''
-  ]);
-  return lines.join('\n');
-}
-
-var footer = buildFooter();
-
-var vendor = finalJsx + '\n' + footer;
-writeFileSync(join(DIST, 'vendor-esarr.js'), vendor);
-
-// 4. Runtime-only vendor: tree-shaken methods core for per-eval injection.
-var runtimeJsx = join(DIST, 'ESARR-runtime.jsx');
-jsxBuild(join(ROOT, 'src', 'runtime.ts'), runtimeJsx);
-var runtimeFinal = shim + readFileSync(runtimeJsx, 'utf8');
-runtimeFinal = runtimeFinal.replace(/"use strict";?/g, '');
-runtimeFinal = es3ify(runtimeFinal);
-var runtimeVendor = runtimeFinal + '\n' + footer;
-writeFileSync(join(DIST, 'vendor-esarr-runtime.js'), runtimeVendor);
-
-// 5. Accelerated self-extracting bundle (ESARR.accel.jsx): espack "1 + n" —
-//    ESARRArray.dll is the payload, the shared esb64 accelerator is embedded
-//    automatically; the native gate enables on the espack-provided lib.
-//    Requires: ../espack (espack-build.mjs) + native/bin/ESARRArray.dll
-//    (npm run native-build). Skips silently when the inputs are absent.
+// 3. Accelerated self-extracting bundle (ESARR.accel.jsx): espack "1 + n" —
+//    ESARRArray.dll is the payload; the shared ESB64Native accelerator (current
+//    sibling DLL) is embedded and the JSX decode lane is the CURRENT ESTC-built
+//    esb64 runtime, passed explicitly so espack's stale vendored copy cannot
+//    re-enter the composite. The native gate enables on the espack-provided lib.
+//    Requires: ../espack (espack-build.mjs) + ../esb64 (runtime + accel DLL) +
+//    native/bin/ESARRArray.dll (npm run native-build). Skips silently when the
+//    inputs are absent.
 var ACCELERATOR = [
   '',
   '(function () {',
@@ -235,42 +134,6 @@ var ACCELERATOR = [
   ''
 ].join('\n');
 
-// Lane C manifest sidecar (contract/manifest-schema-v1, pinned): the payload
-// + accel metadata espack embeds, in the exact schema shape espack-merge
-// consumes. Deterministic (fixed key order, no machine paths). Self-generated
-// here from the same DLL inputs espack embeds; smoke-tested byte-equality
-// against espack-build --manifest-out (Lane A) in the build validation.
-function espackManifest(bundleName, payloadDll, payloadName, payloadVersion, accelDll) {
-  var payloadBytes = readFileSync(payloadDll);
-  var payload = {
-    name: payloadName,
-    version: payloadVersion,
-    len: payloadBytes.length,
-    b64: payloadBytes.toString('base64'),
-    fileName: payloadName + '_v' + payloadVersion + '.dll'
-  };
-  var accel = null;
-  if (accelDll && existsSync(accelDll)) {
-    var accelBytes = readFileSync(accelDll);
-    accel = {
-      name: 'ESB64Native',
-      version: '2',
-      len: accelBytes.length,
-      b64: accelBytes.toString('base64'),
-      fileName: 'ESB64Native_v2.dll'
-    };
-  }
-  return {
-    format: 'espack-manifest',
-    version: 1,
-    bundleName: bundleName,
-    cacheDir: '',
-    chunkSize: 24576, // mirrors espack-build.mjs CHUNK_SIZE
-    accel: accel,
-    payloads: [payload]
-  };
-}
-
 function buildAccel() {
   var espackBuild = join(ROOT, '..', 'espack', 'espack-build.mjs');
   var dll = join(ROOT, 'native', 'bin', 'ESARRArray.dll');
@@ -282,18 +145,32 @@ function buildAccel() {
     console.log('[esarr-build] accel skipped: ' + dll + ' missing (run npm run native-build)');
     return;
   }
+  if (!existsSync(ESB64_RUNTIME)) {
+    console.log('[esarr-build] accel skipped: ESTC-built esb64 runtime not found at ' + ESB64_RUNTIME +
+      ' (build ../esb64 first; stale espack vendor runtime must not be used)');
+    return;
+  }
+  if (!existsSync(ESB64_ACCEL)) {
+    console.log('[esarr-build] accel skipped: ESB64Native accelerator not found at ' + ESB64_ACCEL +
+      ' (build ../esb64 native first)');
+    return;
+  }
   var accelBundle = join(DIST, '.esarr-accel-bundle.jsx');
-  execFileSync(process.execPath, [espackBuild, '--embed', dll, '--accel-version', '2', '--out', accelBundle,
-    '--name', 'esarr', '--quiet'], { stdio: 'inherit' });
+  var manifestOut = join(DIST, 'ESARR.manifest.json');
+  execFileSync(process.execPath, [espackBuild, '--embed', dll, '--out', accelBundle,
+    '--name', 'esarr', '--manifest-out', manifestOut,
+    '--accel', ESB64_ACCEL, '--accel-version', '2', '--quiet'], {
+    stdio: 'inherit',
+    env: Object.assign({}, process.env, {
+      ESB64_RUNTIME_PATH: ESB64_RUNTIME
+    })
+  });
   var bundleText = readFileSync(accelBundle, 'utf8');
   var facadeText = readFileSync(join(DIST, 'ESARR.jsx'), 'utf8');
-  // Lane C (merge architecture v1): emit the manifest sidecar (pinned schema
+  // Lane C (merge architecture v1): the manifest sidecar (pinned schema
   // contract/manifest-schema-v1) + the loader-free facade artifact for the
   // composer. The standalone .accel.jsx below is unchanged in composition
-  // (bundle + facade + adapter; only the adapter's load call changed).
-  var accelDll = process.env.ESB64_ACCEL_PATH || join(ROOT, '..', 'espack', 'vendor', 'ESB64Native.dll');
-  var manifest = espackManifest('esarr', dll, 'ESARRArray', '1', accelDll);
-  writeFileSync(join(DIST, 'ESARR.manifest.json'), JSON.stringify(manifest, null, 2) + '\n');
+  // (bundle + facade + adapter).
   var facadeOut = facadeText + '\n' + ACCELERATOR +
     '// ESARR.facade.jsx - loader-free facade + espack adapter (composer appends to a merged bundle; requires ESPAK on $.global)\n';
   writeFileSync(join(DIST, 'ESARR.facade.jsx'), facadeOut);
@@ -348,4 +225,4 @@ if (process.argv.includes('--accel')) {
 }
 
 console.log('[esarr-build] wrote ' + join(DIST, 'ESARR.jsx') + ', ' + join(DIST, 'vendor-esarr.js') + ', ' +
-  join(DIST, 'vendor-esarr-runtime.js') + ' and ' + join(DIST, 'esarr-core.esm.mjs'));
+  join(DIST, 'vendor-esarr-runtime.js') + ', ' + join(DIST, 'ESARR-runtime.jsx') + ' and ' + join(DIST, 'esarr-core.esm.mjs'));

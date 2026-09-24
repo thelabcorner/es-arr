@@ -49,17 +49,26 @@ export { toReversed, toSorted } from './native-dispatch';
 export { pack, unpack, unpackInto, packRun, scanPacked, pipe } from './native-dispatch';
 // ES3 set: concat/slice are read-bound (engine-native wins) — pure exports.
 export { concat, pop, push, shift, slice, splice, toString, unshift } from './array-es3';
-// ES6+ set (all pure JSX).
+// ES6+ set (all pure JSX). `with` is an ES3 reserved word and cannot be an
+// export binding at the JSX/ESTC boundary, so the shared implementation
+// exports the safe name `withMethod`; the documented public ESARR.with alias
+// is attached by bracket notation in the facade-alias footer
+// (tooling/estc-facade-alias.js), and the ESM entry (src/esm-entry.ts)
+// re-exports it as `with` for Node consumers.
 export { at, copyWithin, entries, fill, find, findIndex, findLast, findLastIndex,
   flat, flatMap, from, keys, of, values,
-  withMethod as with } from './array-es6';
+  withMethod } from './array-es6';
 
 function globalObject(): any {
   if (typeof $ !== 'undefined' && $.global) {
     try { return $.global; } catch (e) { /* ignore */ }
   }
   try {
-    return Function('return this')();
+    // Types-for-Adobe declares the Function constructor with a two-argument
+    // shape; the dynamic one-body form is valid at runtime (and the JSX lane
+    // never needs it — ExtendScript resolves $.global above). Compile-time
+    // declaration-shape cast only, same pattern as ESB64.
+    return (Function as any)('return this')();
   } catch (e2) {
     return null;
   }

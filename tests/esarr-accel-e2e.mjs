@@ -250,10 +250,11 @@ try {
   // bundle never calls ESPAK.load(0), so the versioned DLL is never extracted
   // and the gate never engages. Append the production bundle's facade+adapter
   // suffix (same composition as the fail-path bundle below). The facade starts
-  // at the bind-shim AFTER the espack section (the espack section has its own
-  // earlier bind-shim; taking the LAST one is the facade).
+  // at the ESTC-built `var ESARR=` IIFE, which appears exactly once (the espack
+  // section never declares ESARR; the legacy bind-shim marker is gone with the
+  // ESTC migration).
   var prodBundleText = readFileSync(BUNDLE, 'utf8');
-  var facadeStart = prodBundleText.lastIndexOf('if (typeof Function.prototype.bind !== "function") {');
+  var facadeStart = prodBundleText.lastIndexOf('var ESARR=');
   if (facadeStart < 0) { throw new Error('production bundle facade marker not found'); }
   writeFileSync(v2bundle, readFileSync(v2bundle, 'utf8') + '\n' + prodBundleText.substring(facadeStart));
   var s2 = evalSmoke(v2bundle, SMOKE);
@@ -273,12 +274,12 @@ try {
   // The fail-path bundle must be the FULL composition (espack + ESARR facade +
   // espack adapter) — an espack-ONLY bundle defines ESPAK but never ESARR, so
   // evalSmoke's ESARR.install() would throw on a fresh instance. Reuse the
-  // production bundle's facade+adapter suffix (everything after the espack
-  // section's `g.ESPAK = ESPACK;` IIFE) appended to the espack build output.
+  // production bundle's facade+adapter suffix (everything from the ESTC-built
+  // `var ESARR=` IIFE onward) appended to the espack build output.
   var fb = espackBuild.build ? espackBuild.build({ embed: DLL, out: failBundle, name: 'esarr-e2e-fail', dllVersion: '1', cacheDir: BLOCKER.replace(/\\/g, '/') }) : null;
   if (fb) {
     var prodBundle = readFileSync(BUNDLE, 'utf8');
-    var facadeStart2 = prodBundle.lastIndexOf('if (typeof Function.prototype.bind !== "function") {');
+    var facadeStart2 = prodBundle.lastIndexOf('var ESARR=');
     if (facadeStart2 < 0) { throw new Error('production bundle facade marker not found'); }
     var facadeSuffix = prodBundle.substring(facadeStart2);
     writeFileSync(fb.outPath, readFileSync(fb.outPath, 'utf8') + '\n' + facadeSuffix);

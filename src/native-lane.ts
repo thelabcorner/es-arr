@@ -38,7 +38,7 @@
 // DLL contract (design doc §1, native-coder): ESARRArray.dll, ESInitialize
 // signature "arrSort_sd,arrReverse_sd,arrJoin_sds,arrIndexOf_sdd,
 // arrLastIndexOf_sdd,arrIncludes_sdd,ping_d,version_s"; wire = byte+1 int32
-// packing (lane-wire.ts); array lanes return packed kTypeString, join
+// packing (lane-wire.ts); array lanes return packed ESABI_TYPE_STRING, join
 // returns a plain string, indexOf-family returns a number; errors >= 10000
 // -> JSX fallback. ping(0) === 42; version_s returns a STRING banner (the
 // smoke reads it as a string, not a number). The scan methods take
@@ -194,7 +194,10 @@ export function packChannel(O: any, len: number): string | void {
       if (!(k in O)) return void 0;
       var v = O[k];
       if (!isLaneInt(v)) return void 0;
-      c += String.fromCharCode(((v >>> 24) & 255) + 1, ((v >>> 16) & 255) + 1, ((v >>> 8) & 255) + 1, (v & 255) + 1);
+      // Types-for-Adobe declares fromCharCode with one parameter; the engine's
+      // varargs form is the hot path here (compile-time declaration-shape cast
+      // only, same pattern as ESB64).
+      c += (String.fromCharCode as any)(((v >>> 24) & 255) + 1, ((v >>> 16) & 255) + 1, ((v >>> 8) & 255) + 1, (v & 255) + 1);
     }
     s += c;
   }
@@ -543,7 +546,10 @@ export function enableNativeGateState(options?: NativeGateOptions): EsarrNativeC
     try {
       var dir = opts.dir || '';
       if (dir.length > 0) {
-        ExternalObject.searchFolders = dir + ';' + (ExternalObject.searchFolders || '');
+        // Types-for-Adobe's ExternalObjectConstructor omits searchFolders;
+        // the engine provides it (compile-time declaration-shape cast only).
+        var eo: any = ExternalObject;
+        eo.searchFolders = dir + ';' + (eo.searchFolders || '');
       }
       var libName = opts.libName || 'ESARRArray';
       lib = new ExternalObject('lib:' + libName);

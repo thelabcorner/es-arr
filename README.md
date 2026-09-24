@@ -368,6 +368,7 @@ All measured live on ExtendScript 4.5.6 (Illustrator 30.6.0); re-probe other hos
 ## Development
 
 ```bash
+git submodule update --init --recursive   # pins ESABI v0.3.0 for the native ABI
 npm install            # esbuild + typescript
 npm run build          # dist/ESARR.jsx, vendor-esarr.js, vendor-esarr-runtime.js, esarr-core.esm.mjs
 npm run native-build   # native/bin/ESARRArray.dll (freestanding clang/lld, deterministic build.ps1)
@@ -397,7 +398,8 @@ The identical TypeScript core (`src/array-core.ts` ES5 set, `src/array-es3.ts` E
 ```
 esarr/
   src/            TypeScript core (array-core.ts ES5, array-es3.ts, array-es6.ts, sort-core.ts), native gate (native-lane.ts, lane-wire.ts, native-dispatch.ts)
-  native/         C source + build.ps1 + SoSharedLibDefs.h; bin/ = ESARRArray.dll + test drivers
+  native/         C source + build.ps1; bin/ = ESARRArray.dll + test drivers
+  deps/esabi/     pinned ESABI v0.3.0 submodule; sole ExternalObject ABI authority
   tests/          vectors.ts + callbacks.ts + Node harnesses (custom, no framework) + fuzz + wire + gate-on differential + accel e2e + vendor-sync guard
   bench/          round-1 raw JSON + resume markers (benchmark data)
   docs/           design contract + benchmark rounds + verification report

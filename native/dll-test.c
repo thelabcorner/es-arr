@@ -3,14 +3,15 @@
  * Illustrator, no CRT needed).
  *
  * Loads the built DLL via LoadLibrary and drives every exported method
- * through the documented TaggedData ABI per the DESIGN DOC contract v1
+ * through the documented esabi_value ABI per the DESIGN DOC contract v1
  * (byte+1 wire §3.2, method semantics §1.3, error codes §1.4), checking
  * against known vectors (the differential corpus's ToString-order sort
  * cases plus edge cases). Catches logic/codec errors before the COM probe.
  *
  * Build (clang+lld, kernel32 only):
  *   clang --target=x86_64-pc-windows-msvc -O2 -ffreestanding -fno-builtin \
- *     -fno-stack-protector -mno-stack-arg-probe -c dll-test.c -o dll-test.obj
+ *     -fno-stack-protector -mno-stack-arg-probe -I..\\deps\\esabi\\include \\
+ *     -c dll-test.c -o dll-test.obj
  *   lld -flavor link /subsystem:console /entry:mainCRTStartup /nodefaultlib \
  *     /machine:x64 /out:dll-test.exe dll-test.obj kernel32.lib
  * Usage: dll-test.exe <path-to-ESARRArray.dll>
@@ -42,23 +43,7 @@ __declspec(dllimport) char* __cdecl GetCommandLineA(void);
 /* MSVC/clang FP marker for freestanding builds */
 unsigned int _fltused = 0;
 
-/* ---- TaggedData ABI (SoSharedLibDefs.h, pack 8) ---- */
-typedef struct TaggedData {
-    union {
-        long intval;
-        double fltval;
-        char* string;
-        void* hObject;
-    } data;
-    long type;
-    long filler;
-} TaggedData;
-
-#define kTypeUndefined 0
-#define kTypeDouble    3
-#define kTypeString    4
-#define kTypeInteger   123
-#define kTypeUInteger  124
+#include <esabi/esabi.h>
 
 #define K_ESOK 0
 #define K_ERR_BAD_ARGS   20
@@ -66,11 +51,11 @@ typedef struct TaggedData {
 #define K_ERR_SEP        10002
 #define K_ERR_NO_MEM     10003
 
-typedef char* (*ESInitFn)(TaggedData*, long);
-typedef long (*ESVerFn)(void);
-typedef void (*ESFreeFn)(void*);
-typedef void (*ESTermFn)(void);
-typedef long (*ESFunc)(TaggedData*, long, TaggedData*);
+typedef char* (ESABI_CALL *ESInitFn)(esabi_value*, esabi_long);
+typedef esabi_long (ESABI_CALL *ESVerFn)(void);
+typedef void (ESABI_CALL *ESFreeFn)(void*);
+typedef void (ESABI_CALL *ESTermFn)(void);
+typedef esabi_error (ESABI_CALL *ESFunc)(esabi_value*, esabi_long, esabi_value*);
 
 static int g_fail = 0;
 static int g_pass = 0;
@@ -329,35 +314,35 @@ void mainCRTStartup(void)
 
             /* ---- ping/version ---- */
             {
-                TaggedData argv[1], rv;
-                argv[0].type = kTypeInteger;
-                argv[0].data.intval = 0;
-                rv.type = kTypeUndefined;
-                check(ping(argv, 1, &rv) == K_ESOK && rv.data.intval == 42,
+                esabi_value argv[1], rv;
+                argv[0].type = ESABI_TYPE_INTEGER;
+                argv[0].payload.signed_value = 0;
+                rv.type = ESABI_TYPE_UNDEFINED;
+                check(ping(argv, 1, &rv) == K_ESOK && rv.payload.signed_value == 42,
                       "ping(0) -> 42");
-                rv.type = kTypeUndefined;
+                rv.type = ESABI_TYPE_UNDEFINED;
                 check(version(argv, 1, &rv) == K_ESOK &&
-                      rv.data.string && str_contains(rv.data.string, "ESARRArray"),
+                      rv.payload.string_value && str_contains(rv.payload.string_value, "ESARRArray"),
                       "version(0) -> banner string");
-                ESFreeMem(rv.data.string);
+                ESFreeMem(rv.payload.string_value);
             }
 
             /* ---- arrSort(packed, len) ---- */
             {
                 char packed[64] = {0};
-                TaggedData argv[2], rv;
+                esabi_value argv[2], rv;
                 long vals[3] = { 3, 1, 2 };
                 long expect[3] = { 1, 2, 3 };
                 long nbytes = pack_array(packed, vals, 3);
                 long cur = 0;
                 (void)nbytes;
-                argv[0].type = kTypeString;
-                argv[0].data.string = packed;
-                argv[1].type = kTypeInteger;
-                argv[1].data.intval = 3;
-                rv.type = kTypeUndefined;
+                argv[0].type = ESABI_TYPE_STRING;
+                argv[0].payload.string_value = packed;
+                argv[1].type = ESABI_TYPE_INTEGER;
+                argv[1].payload.signed_value = 3;
+                rv.type = ESABI_TYPE_UNDEFINED;
                 if (arrSort(argv, 2, &rv) == K_ESOK) {
-                    char* s = rv.data.string;
+                    char* s = rv.payload.string_value;
                     check(s && unpack_int32_cur(s, &cur) == expect[0] &&
                           unpack_int32_cur(s, &cur) == expect[1] &&
                           unpack_int32_cur(s, &cur) == expect[2],
@@ -371,19 +356,19 @@ void mainCRTStartup(void)
             /* ToString-order (doc §4 mandatory vectors) */
             {
                 char packed[64] = {0};
-                TaggedData argv[2], rv;
+                esabi_value argv[2], rv;
                 long vals[4] = { 10, 9, 1, 2 };
                 long expect[4] = { 1, 10, 2, 9 };
                 long i, ok = 1;
                 long cur = 0;
                 pack_array(packed, vals, 4);
-                argv[0].type = kTypeString;
-                argv[0].data.string = packed;
-                argv[1].type = kTypeInteger;
-                argv[1].data.intval = 4;
-                rv.type = kTypeUndefined;
+                argv[0].type = ESABI_TYPE_STRING;
+                argv[0].payload.string_value = packed;
+                argv[1].type = ESABI_TYPE_INTEGER;
+                argv[1].payload.signed_value = 4;
+                rv.type = ESABI_TYPE_UNDEFINED;
                 if (arrSort(argv, 2, &rv) == K_ESOK) {
-                    char* s = rv.data.string;
+                    char* s = rv.payload.string_value;
                     for (i = 0; i < 4; i++) {
                         if (unpack_int32_cur(s, &cur) != expect[i]) ok = 0;
                     }
@@ -396,19 +381,19 @@ void mainCRTStartup(void)
             }
             {
                 char packed[64] = {0};
-                TaggedData argv[2], rv;
+                esabi_value argv[2], rv;
                 long vals[4] = { -5, 0, 7, 4 };
                 long expect[4] = { -5, 0, 4, 7 };
                 long i, ok = 1;
                 long cur = 0;
                 pack_array(packed, vals, 4);
-                argv[0].type = kTypeString;
-                argv[0].data.string = packed;
-                argv[1].type = kTypeInteger;
-                argv[1].data.intval = 4;
-                rv.type = kTypeUndefined;
+                argv[0].type = ESABI_TYPE_STRING;
+                argv[0].payload.string_value = packed;
+                argv[1].type = ESABI_TYPE_INTEGER;
+                argv[1].payload.signed_value = 4;
+                rv.type = ESABI_TYPE_UNDEFINED;
                 if (arrSort(argv, 2, &rv) == K_ESOK) {
-                    char* s = rv.data.string;
+                    char* s = rv.payload.string_value;
                     for (i = 0; i < 4; i++) {
                         if (unpack_int32_cur(s, &cur) != expect[i]) ok = 0;
                     }
@@ -421,19 +406,19 @@ void mainCRTStartup(void)
             }
             {
                 char packed[64] = {0};
-                TaggedData argv[2], rv;
+                esabi_value argv[2], rv;
                 long vals[3] = { -9, -10, -11 };
                 long expect[3] = { -10, -11, -9 }; /* Node-verified ToString order */
                 long i, ok = 1;
                 long cur = 0;
                 pack_array(packed, vals, 3);
-                argv[0].type = kTypeString;
-                argv[0].data.string = packed;
-                argv[1].type = kTypeInteger;
-                argv[1].data.intval = 3;
-                rv.type = kTypeUndefined;
+                argv[0].type = ESABI_TYPE_STRING;
+                argv[0].payload.string_value = packed;
+                argv[1].type = ESABI_TYPE_INTEGER;
+                argv[1].payload.signed_value = 3;
+                rv.type = ESABI_TYPE_UNDEFINED;
                 if (arrSort(argv, 2, &rv) == K_ESOK) {
-                    char* s = rv.data.string;
+                    char* s = rv.payload.string_value;
                     for (i = 0; i < 3; i++) {
                         if (unpack_int32_cur(s, &cur) != expect[i]) ok = 0;
                     }
@@ -446,7 +431,7 @@ void mainCRTStartup(void)
             }
             {
                 char packed[64] = {0};
-                TaggedData argv[2], rv;
+                esabi_value argv[2], rv;
                 long vals[4] = { 1000, 7, 100, 8 };
                 long expect[4] = { 1000, 7, 100, 8 }; /* "1000"<"7"<"100"<"8"? no: "100"<"1000"<"7"<"8" */
                 long i, ok = 1;
@@ -456,13 +441,13 @@ void mainCRTStartup(void)
                 expect[2] = 7;
                 expect[3] = 8;
                 pack_array(packed, vals, 4);
-                argv[0].type = kTypeString;
-                argv[0].data.string = packed;
-                argv[1].type = kTypeInteger;
-                argv[1].data.intval = 4;
-                rv.type = kTypeUndefined;
+                argv[0].type = ESABI_TYPE_STRING;
+                argv[0].payload.string_value = packed;
+                argv[1].type = ESABI_TYPE_INTEGER;
+                argv[1].payload.signed_value = 4;
+                rv.type = ESABI_TYPE_UNDEFINED;
                 if (arrSort(argv, 2, &rv) == K_ESOK) {
-                    char* s = rv.data.string;
+                    char* s = rv.payload.string_value;
                     for (i = 0; i < 4; i++) {
                         if (unpack_int32_cur(s, &cur) != expect[i]) ok = 0;
                     }
@@ -475,19 +460,19 @@ void mainCRTStartup(void)
             }
             {
                 char packed[64] = {0};
-                TaggedData argv[2], rv;
+                esabi_value argv[2], rv;
                 long vals[3] = { 2147483647L, -2147483648L, 0 };
                 long expect[3] = { -2147483648L, 0, 2147483647L };
                 long i, ok = 1;
                 long cur = 0;
                 pack_array(packed, vals, 3);
-                argv[0].type = kTypeString;
-                argv[0].data.string = packed;
-                argv[1].type = kTypeInteger;
-                argv[1].data.intval = 3;
-                rv.type = kTypeUndefined;
+                argv[0].type = ESABI_TYPE_STRING;
+                argv[0].payload.string_value = packed;
+                argv[1].type = ESABI_TYPE_INTEGER;
+                argv[1].payload.signed_value = 3;
+                rv.type = ESABI_TYPE_UNDEFINED;
                 if (arrSort(argv, 2, &rv) == K_ESOK) {
-                    char* s = rv.data.string;
+                    char* s = rv.payload.string_value;
                     for (i = 0; i < 3; i++) {
                         if (unpack_int32_cur(s, &cur) != expect[i]) ok = 0;
                     }
@@ -501,19 +486,19 @@ void mainCRTStartup(void)
             /* duplicates: stable order allowed either way; check group identity */
             {
                 char packed[64] = {0};
-                TaggedData argv[2], rv;
+                esabi_value argv[2], rv;
                 long vals[4] = { 2, 2, 1, 1 };
                 long expect[4] = { 1, 1, 2, 2 };
                 long i, ok = 1;
                 long cur = 0;
                 pack_array(packed, vals, 4);
-                argv[0].type = kTypeString;
-                argv[0].data.string = packed;
-                argv[1].type = kTypeInteger;
-                argv[1].data.intval = 4;
-                rv.type = kTypeUndefined;
+                argv[0].type = ESABI_TYPE_STRING;
+                argv[0].payload.string_value = packed;
+                argv[1].type = ESABI_TYPE_INTEGER;
+                argv[1].payload.signed_value = 4;
+                rv.type = ESABI_TYPE_UNDEFINED;
                 if (arrSort(argv, 2, &rv) == K_ESOK) {
-                    char* s = rv.data.string;
+                    char* s = rv.payload.string_value;
                     for (i = 0; i < 4; i++) {
                         if (unpack_int32_cur(s, &cur) != expect[i]) ok = 0;
                     }
@@ -528,17 +513,17 @@ void mainCRTStartup(void)
             /* ---- arrReverse(packed, len) ---- */
             {
                 char packed[64] = {0};
-                TaggedData argv[2], rv;
+                esabi_value argv[2], rv;
                 long vals[3] = { 1, 2, 3 };
                 long cur = 0;
                 pack_array(packed, vals, 3);
-                argv[0].type = kTypeString;
-                argv[0].data.string = packed;
-                argv[1].type = kTypeInteger;
-                argv[1].data.intval = 3;
-                rv.type = kTypeUndefined;
+                argv[0].type = ESABI_TYPE_STRING;
+                argv[0].payload.string_value = packed;
+                argv[1].type = ESABI_TYPE_INTEGER;
+                argv[1].payload.signed_value = 3;
+                rv.type = ESABI_TYPE_UNDEFINED;
                 if (arrReverse(argv, 2, &rv) == K_ESOK) {
-                    char* s = rv.data.string;
+                    char* s = rv.payload.string_value;
                     check(s && unpack_int32_cur(s, &cur) == 3 &&
                           unpack_int32_cur(s, &cur) == 2 &&
                           unpack_int32_cur(s, &cur) == 1,
@@ -553,19 +538,19 @@ void mainCRTStartup(void)
             /* ---- arrJoin(packed, len, sep) ---- */
             {
                 char packed[64] = {0};
-                TaggedData argv[3], rv;
+                esabi_value argv[3], rv;
                 long vals[3] = { 1, 2, 3 };
                 char* s;
                 pack_array(packed, vals, 3);
-                argv[0].type = kTypeString;
-                argv[0].data.string = packed;
-                argv[1].type = kTypeInteger;
-                argv[1].data.intval = 3;
-                argv[2].type = kTypeString;
-                argv[2].data.string = ",";
-                rv.type = kTypeUndefined;
+                argv[0].type = ESABI_TYPE_STRING;
+                argv[0].payload.string_value = packed;
+                argv[1].type = ESABI_TYPE_INTEGER;
+                argv[1].payload.signed_value = 3;
+                argv[2].type = ESABI_TYPE_STRING;
+                argv[2].payload.string_value = ",";
+                rv.type = ESABI_TYPE_UNDEFINED;
                 if (arrJoin(argv, 3, &rv) == K_ESOK) {
-                    s = rv.data.string;
+                    s = rv.payload.string_value;
                     check(s && str_eq(s, "1,2,3") == 0, "arrJoin [1,2,3] \",\" -> \"1,2,3\"");
                     ESFreeMem(s);
                 }
@@ -575,19 +560,19 @@ void mainCRTStartup(void)
             }
             {
                 char packed[64] = {0};
-                TaggedData argv[3], rv;
+                esabi_value argv[3], rv;
                 long vals[3] = { -1, 0, 1 };
                 char* s;
                 pack_array(packed, vals, 3);
-                argv[0].type = kTypeString;
-                argv[0].data.string = packed;
-                argv[1].type = kTypeInteger;
-                argv[1].data.intval = 3;
-                argv[2].type = kTypeString;
-                argv[2].data.string = "";
-                rv.type = kTypeUndefined;
+                argv[0].type = ESABI_TYPE_STRING;
+                argv[0].payload.string_value = packed;
+                argv[1].type = ESABI_TYPE_INTEGER;
+                argv[1].payload.signed_value = 3;
+                argv[2].type = ESABI_TYPE_STRING;
+                argv[2].payload.string_value = "";
+                rv.type = ESABI_TYPE_UNDEFINED;
                 if (arrJoin(argv, 3, &rv) == K_ESOK) {
-                    s = rv.data.string;
+                    s = rv.payload.string_value;
                     check(s && str_eq(s, "-101") == 0, "arrJoin [-1,0,1] \"\" -> \"-101\"");
                     ESFreeMem(s);
                 }
@@ -597,19 +582,19 @@ void mainCRTStartup(void)
             }
             {
                 char packed[64] = {0};
-                TaggedData argv[3], rv;
+                esabi_value argv[3], rv;
                 long vals[2] = { -2147483648L, 2147483647L };
                 char* s;
                 pack_array(packed, vals, 2);
-                argv[0].type = kTypeString;
-                argv[0].data.string = packed;
-                argv[1].type = kTypeInteger;
-                argv[1].data.intval = 2;
-                argv[2].type = kTypeString;
-                argv[2].data.string = " | ";
-                rv.type = kTypeUndefined;
+                argv[0].type = ESABI_TYPE_STRING;
+                argv[0].payload.string_value = packed;
+                argv[1].type = ESABI_TYPE_INTEGER;
+                argv[1].payload.signed_value = 2;
+                argv[2].type = ESABI_TYPE_STRING;
+                argv[2].payload.string_value = " | ";
+                rv.type = ESABI_TYPE_UNDEFINED;
                 if (arrJoin(argv, 3, &rv) == K_ESOK) {
-                    s = rv.data.string;
+                    s = rv.payload.string_value;
                     check(s && str_eq(s, "-2147483648 | 2147483647") == 0,
                           "arrJoin int32 bounds multi-char sep");
                     ESFreeMem(s);
@@ -619,16 +604,16 @@ void mainCRTStartup(void)
                 }
             }
             {
-                TaggedData argv[3], rv;
-                argv[0].type = kTypeString;
-                argv[0].data.string = "";
-                argv[1].type = kTypeInteger;
-                argv[1].data.intval = 0;
-                argv[2].type = kTypeString;
-                argv[2].data.string = ",";
-                rv.type = kTypeUndefined;
+                esabi_value argv[3], rv;
+                argv[0].type = ESABI_TYPE_STRING;
+                argv[0].payload.string_value = "";
+                argv[1].type = ESABI_TYPE_INTEGER;
+                argv[1].payload.signed_value = 0;
+                argv[2].type = ESABI_TYPE_STRING;
+                argv[2].payload.string_value = ",";
+                rv.type = ESABI_TYPE_UNDEFINED;
                 if (arrJoin(argv, 3, &rv) == K_ESOK) {
-                    char* s = rv.data.string;
+                    char* s = rv.payload.string_value;
                     check(s && str_eq(s, "") == 0, "arrJoin [] -> \"\"");
                     ESFreeMem(s);
                 }
@@ -640,104 +625,104 @@ void mainCRTStartup(void)
             /* ---- arrIndexOf / arrLastIndexOf / arrIncludes (packed, len, search) ---- */
             {
                 char packed[64] = {0};
-                TaggedData argv[3], rv;
+                esabi_value argv[3], rv;
                 long vals[4] = { 1, 2, 3, 2 };
                 pack_array(packed, vals, 4);
-                argv[0].type = kTypeString;
-                argv[0].data.string = packed;
-                argv[1].type = kTypeInteger;
-                argv[1].data.intval = 4;
-                argv[2].type = kTypeInteger;
-                argv[2].data.intval = 2;
-                rv.type = kTypeUndefined;
-                check(arrIndexOf(argv, 3, &rv) == K_ESOK && rv.data.intval == 1,
+                argv[0].type = ESABI_TYPE_STRING;
+                argv[0].payload.string_value = packed;
+                argv[1].type = ESABI_TYPE_INTEGER;
+                argv[1].payload.signed_value = 4;
+                argv[2].type = ESABI_TYPE_INTEGER;
+                argv[2].payload.signed_value = 2;
+                rv.type = ESABI_TYPE_UNDEFINED;
+                check(arrIndexOf(argv, 3, &rv) == K_ESOK && rv.payload.signed_value == 1,
                       "arrIndexOf [1,2,3,2] 2 -> 1");
-                rv.type = kTypeUndefined;
-                check(arrLastIndexOf(argv, 3, &rv) == K_ESOK && rv.data.intval == 3,
+                rv.type = ESABI_TYPE_UNDEFINED;
+                check(arrLastIndexOf(argv, 3, &rv) == K_ESOK && rv.payload.signed_value == 3,
                       "arrLastIndexOf [1,2,3,2] 2 -> 3");
-                rv.type = kTypeUndefined;
-                check(arrIncludes(argv, 3, &rv) == K_ESOK && rv.data.intval == 1,
+                rv.type = ESABI_TYPE_UNDEFINED;
+                check(arrIncludes(argv, 3, &rv) == K_ESOK && rv.payload.signed_value == 1,
                       "arrIncludes [1,2,3,2] 2 -> 1");
-                argv[2].data.intval = 9;
-                rv.type = kTypeUndefined;
-                check(arrIndexOf(argv, 3, &rv) == K_ESOK && rv.data.intval == -1,
+                argv[2].payload.signed_value = 9;
+                rv.type = ESABI_TYPE_UNDEFINED;
+                check(arrIndexOf(argv, 3, &rv) == K_ESOK && rv.payload.signed_value == -1,
                       "arrIndexOf missing -> -1");
-                rv.type = kTypeUndefined;
-                check(arrLastIndexOf(argv, 3, &rv) == K_ESOK && rv.data.intval == -1,
+                rv.type = ESABI_TYPE_UNDEFINED;
+                check(arrLastIndexOf(argv, 3, &rv) == K_ESOK && rv.payload.signed_value == -1,
                       "arrLastIndexOf missing -> -1");
-                rv.type = kTypeUndefined;
-                check(arrIncludes(argv, 3, &rv) == K_ESOK && rv.data.intval == 0,
+                rv.type = ESABI_TYPE_UNDEFINED;
+                check(arrIncludes(argv, 3, &rv) == K_ESOK && rv.payload.signed_value == 0,
                       "arrIncludes missing -> 0");
-                argv[2].data.intval = 0;
-                argv[1].data.intval = 0; /* empty payload => len must be 0 */
-                argv[0].data.string = "";
-                rv.type = kTypeUndefined;
-                check(arrIndexOf(argv, 3, &rv) == K_ESOK && rv.data.intval == -1,
+                argv[2].payload.signed_value = 0;
+                argv[1].payload.signed_value = 0; /* empty payload => len must be 0 */
+                argv[0].payload.string_value = "";
+                rv.type = ESABI_TYPE_UNDEFINED;
+                check(arrIndexOf(argv, 3, &rv) == K_ESOK && rv.payload.signed_value == -1,
                       "arrIndexOf empty -> -1");
             }
 
             /* ---- error paths (doc §1.4) ---- */
             {
                 char packed[64] = {0};
-                TaggedData argv[2], rv;
+                esabi_value argv[2], rv;
                 long vals[3] = { 1, 2, 3 };
                 pack_array(packed, vals, 3);
-                argv[0].type = kTypeString;
-                argv[0].data.string = packed;
-                argv[1].type = kTypeInteger;
-                argv[1].data.intval = 2; /* len 2 but 3 elements packed */
-                rv.type = kTypeUndefined;
+                argv[0].type = ESABI_TYPE_STRING;
+                argv[0].payload.string_value = packed;
+                argv[1].type = ESABI_TYPE_INTEGER;
+                argv[1].payload.signed_value = 2; /* len 2 but 3 elements packed */
+                rv.type = ESABI_TYPE_UNDEFINED;
                 check(arrSort(argv, 2, &rv) == K_ERR_PAYLOAD,
                       "arrSort len mismatch -> 10001");
             }
             {
                 char packed[64] = {0};
-                TaggedData argv[2], rv;
+                esabi_value argv[2], rv;
                 long vals[3] = { 1, 2, 3 };
                 pack_array(packed, vals, 3);
-                argv[0].type = kTypeString;
-                argv[0].data.string = packed;
-                argv[1].type = kTypeInteger;
-                argv[1].data.intval = 3;
-                rv.type = kTypeUndefined;
+                argv[0].type = ESABI_TYPE_STRING;
+                argv[0].payload.string_value = packed;
+                argv[1].type = ESABI_TYPE_INTEGER;
+                argv[1].payload.signed_value = 3;
+                rv.type = ESABI_TYPE_UNDEFINED;
                 check(arrReverse(argv, 2, &rv) == K_ESOK, "arrReverse valid");
                 /* malformed channel: invalid UTF-8 lead byte (unit > 256) */
-                argv[0].data.string = "\xE0\x80\x80\x01";
-                argv[1].data.intval = 1;
-                rv.type = kTypeUndefined;
+                argv[0].payload.string_value = "\xE0\x80\x80\x01";
+                argv[1].payload.signed_value = 1;
+                rv.type = ESABI_TYPE_UNDEFINED;
                 check(arrReverse(argv, 2, &rv) == K_ERR_PAYLOAD,
                       "arrReverse invalid UTF-8 unit -> 10001");
             }
             {
-                TaggedData argv[2], rv;
-                argv[0].type = kTypeString;
-                argv[0].data.string = "";
-                argv[1].type = kTypeInteger;
-                argv[1].data.intval = 1000000001L; /* over the sanity cap */
-                rv.type = kTypeUndefined;
+                esabi_value argv[2], rv;
+                argv[0].type = ESABI_TYPE_STRING;
+                argv[0].payload.string_value = "";
+                argv[1].type = ESABI_TYPE_INTEGER;
+                argv[1].payload.signed_value = 1000000001L; /* over the sanity cap */
+                rv.type = ESABI_TYPE_UNDEFINED;
                 check(arrSort(argv, 2, &rv) == K_ERR_PAYLOAD,
                       "arrSort len > 1e9 -> 10001");
             }
             {
                 char packed[64] = {0};
-                TaggedData argv[3], rv;
+                esabi_value argv[3], rv;
                 long vals[1] = { 5 };
                 pack_array(packed, vals, 1);
-                argv[0].type = kTypeString;
-                argv[0].data.string = packed;
-                argv[1].type = kTypeInteger;
-                argv[1].data.intval = 1;
-                argv[2].type = kTypeDouble;
-                argv[2].data.fltval = 1.5; /* wrong arg type */
-                rv.type = kTypeUndefined;
+                argv[0].type = ESABI_TYPE_STRING;
+                argv[0].payload.string_value = packed;
+                argv[1].type = ESABI_TYPE_INTEGER;
+                argv[1].payload.signed_value = 1;
+                argv[2].type = ESABI_TYPE_DOUBLE;
+                argv[2].payload.double_value = 1.5; /* wrong arg type */
+                rv.type = ESABI_TYPE_UNDEFINED;
                 check(arrJoin(argv, 3, &rv) == K_ERR_BAD_ARGS,
                       "arrJoin non-string sep -> 20");
             }
             {
-                TaggedData argv[1], rv;
-                argv[0].type = kTypeDouble;
-                argv[0].data.fltval = 1.5;
-                rv.type = kTypeUndefined;
+                esabi_value argv[1], rv;
+                argv[0].type = ESABI_TYPE_DOUBLE;
+                argv[0].payload.double_value = 1.5;
+                rv.type = ESABI_TYPE_UNDEFINED;
                 check(arrSort(argv, 1, &rv) == K_ERR_BAD_ARGS,
                       "arrSort wrong argc -> 20");
             }

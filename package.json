@@ -1,6 +1,6 @@
 {
   "name": "esarr",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "ESARR — the full Array surface (ES3 built-ins + ES5 + ES6+ additions) for Adobe ExtendScript (ES3), engine-measured, spec-exact, with a native ExternalObject acceleration gate (ESARRArray.dll) and espack self-extracting accel bundle",
   "type": "module",
   "main": "dist/esarr-core.esm.mjs",
@@ -15,7 +15,12 @@
     "live-verify": "node tests/esarr-live-verify.mjs",
     "accel-e2e": "node tests/esarr-accel-e2e.mjs",
     "vendor-sync": "node esarr-vendor-sync.mjs",
-    "vendor-sync-check": "node esarr-vendor-sync.mjs --check"
+    "vendor-sync-check": "node esarr-vendor-sync.mjs --check",
+    "estc:static": "node ../extendscript-toolchain/bin/estc.mjs check dist/ESARR.jsx --no-target && node ../extendscript-toolchain/bin/estc.mjs check dist/vendor-esarr.js --no-target && node ../extendscript-toolchain/bin/estc.mjs check dist/ESARR-runtime.jsx --no-target && node ../extendscript-toolchain/bin/estc.mjs check dist/vendor-esarr-runtime.js --no-target && node ../extendscript-toolchain/bin/estc.mjs check dist/ESARR.facade.jsx --no-target && node ../extendscript-toolchain/bin/estc.mjs check dist/ESARR.accel.jsx --no-target && node ../extendscript-toolchain/bin/estc.mjs check dist/ESARR.accel.min.jsx --no-target",
+    "estc:live-parse": "node ../extendscript-toolchain/bin/estc.mjs check dist/ESARR.jsx --no-target --live --launch && node ../extendscript-toolchain/bin/estc.mjs check dist/vendor-esarr.js --no-target --live --launch && node ../extendscript-toolchain/bin/estc.mjs check dist/ESARR-runtime.jsx --no-target --live --launch && node ../extendscript-toolchain/bin/estc.mjs check dist/vendor-esarr-runtime.js --no-target --live --launch && node ../extendscript-toolchain/bin/estc.mjs check dist/ESARR.facade.jsx --no-target --live --launch && node ../extendscript-toolchain/bin/estc.mjs check dist/ESARR.accel.jsx --no-target --live --launch && node ../extendscript-toolchain/bin/estc.mjs check dist/ESARR.accel.min.jsx --no-target --live --launch",
+    "verify": "npm run typecheck && npm run build:accel && npm run test && npm run fuzz && npm run estc:static && npm run vendor-sync-check",
+    "release:gate": "npm run verify && npm run estc:live-parse && npm run live-verify && npm run accel-e2e",
+    "prepublishOnly": "npm run release:gate"
   },
   "devDependencies": {
     "esbuild": "^0.28.1",

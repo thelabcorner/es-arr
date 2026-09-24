@@ -15,15 +15,15 @@
  * differentially validated against Node String(n): 917,044 values / 3
  * seeds / 0 mismatches).
  *
- * Direct-interface ABI (SoSharedLibDefs.h): every method is
- *   long fn(TaggedData* argv, long argc, TaggedData* retval);
+ * Direct-interface ABI is provided by ESABI. Every exported method uses
+ * ESABI's ExternalObject direct-function contract.
  * Returned strings are UTF-8, allocated with esarr_malloc, freed by the
  * host via ESFreeMem (== esarr_free). retval is preset to undefined by the
  * host; on error paths it is left untouched. Errors (design doc §1.4):
  *   10001 payload/len mismatch or malformed payload
  *   10002 sep too long / internal arg error
  *   10003 allocator pool exhausted
- *   20    kESErrBadArgumentList (host-visible, catchable)
+ *   20    ESABI_ERR_BAD_ARGUMENTS (host-visible, catchable)
  * Negative codes are fatal/uncatchable and NEVER returned.
  *
  * WIRE (BYTE+1 — binding final, decisions/wire-final v3/v4; the nibble
@@ -49,16 +49,14 @@
  *   arrIncludes_sdd (packed, len, search) -> 1 if present else 0
  *                    (SameValueZero; int32 payloads: identical to ===,
  *                    -0/0 compare equal).
- *   ping_d          -> 42 (kTypeInteger); load/binding smoke.
- *   version_s       -> banner (kTypeString).
+ *   ping_d          -> 42 (ESABI_TYPE_INTEGER); load/binding smoke.
+ *   version_s       -> banner (ESABI_TYPE_STRING).
  ***************************************************************************/
 
 #include <stddef.h>
 
-#include "SoSharedLibDefs.h"
+#include <esabi/esabi.h>
 #include "esarr_format.c" /* ES Number->string engine (validated) */
-
-#define ESARR_API __declspec(dllexport)
 
 /* MSVC/clang emits a reference to _fltused when any floating-point code is
    present; freestanding builds must provide it (the CRT normally does).
@@ -197,10 +195,10 @@ static char* esarr_dup_bytes(const unsigned char* p, size_t n)
 
 /* ---- numeric argument helper (accept the whole numeric family) ---- */
 
-static long esarr_arg_as_long(const TaggedData* a)
+static long esarr_arg_as_long(const esabi_value* a)
 {
-    if (a->type == kTypeDouble) {
-        double d = a->data.fltval;
+    if (a->type == ESABI_TYPE_DOUBLE) {
+        double d = a->payload.double_value;
         /* ToInteger: NaN -> 0, +/-Inf stay extreme, truncate toward zero */
         if (d != d) {
             return 0;
@@ -213,8 +211,8 @@ static long esarr_arg_as_long(const TaggedData* a)
         }
         return (long)d;
     }
-    if (a->type == kTypeInteger || a->type == kTypeUInteger) {
-        return a->data.intval;
+    if (a->type == ESABI_TYPE_INTEGER || a->type == ESABI_TYPE_UINTEGER) {
+        return a->payload.signed_value;
     }
     return 0; /* non-numeric: treated as 0 (lenient) */
 }
@@ -426,7 +424,7 @@ static void esarr_stable_sort(EsarrSortItem* items, long n)
 
 /* ---- mandatory entry points ---- */
 
-ESARR_API char* ESInitialize(TaggedData* argv, long argc)
+ESABI_INITIALIZE_FUNCTION
 {
     (void)argv;
     (void)argc;
@@ -435,54 +433,52 @@ ESARR_API char* ESInitialize(TaggedData* argv, long argc)
     return "arrSort_sd,arrReverse_sd,arrJoin_sds,arrIndexOf_sdd,arrLastIndexOf_sdd,arrIncludes_sdd,ping_d,version_s";
 }
 
-ESARR_API long ESGetVersion(void)
+ESABI_VERSION_FUNCTION
 {
     return 1;
 }
 
-ESARR_API void ESFreeMem(void* p)
+ESABI_FREE_FUNCTION
 {
-    esarr_free(p);
+    esarr_free(pointer);
 }
 
-ESARR_API void ESTerminate(void)
+ESABI_TERMINATE_FUNCTION
 {
     /* no persistent native state */
 }
 
 /* ---- methods ---- */
 
-/* ping(dummy) -> 42 (kTypeInteger); the gate smoke (design doc §8.2). */
-ESARR_API long ping(TaggedData* argv, long argc, TaggedData* retval)
+/* ping(dummy) -> 42 (ESABI_TYPE_INTEGER); the gate smoke (design doc §8.2). */
+ESABI_DIRECT_FUNCTION(ping)
 {
     (void)argv;
     if (argc < 1) {
-        return kESErrBadArgumentList;
+        return ESABI_ERR_BAD_ARGUMENTS;
     }
-    retval->type = kTypeInteger;
-    retval->data.intval = 42;
-    return kESErrOK;
+    esabi_value_set_i32(retval, (esabi_i32)(42));
+    return ESABI_OK;
 }
 
-/* version(dummy) -> banner string (kTypeString); family style per §1.3. */
-ESARR_API long version(TaggedData* argv, long argc, TaggedData* retval)
+/* version(dummy) -> banner string (ESABI_TYPE_STRING); family style per §1.3. */
+ESABI_DIRECT_FUNCTION(version)
 {
     static const char banner[] = "ESARRArray 1.0.0 (ESARR native lanes; byte+1 wire)";
     (void)argv;
     if (argc < 1) {
-        return kESErrBadArgumentList;
+        return ESABI_ERR_BAD_ARGUMENTS;
     }
-    retval->type = kTypeString;
-    retval->data.string = esarr_dup_bytes((const unsigned char*)banner,
-                                          sizeof(banner) - 1);
-    if (retval->data.string == NULL) {
+    esabi_value_set_string(retval, esarr_dup_bytes((const unsigned char*)banner,
+                                          sizeof(banner) - 1));
+    if (retval->payload.string_value == NULL) {
         return ESARR_ERR_NO_MEM;
     }
-    return kESErrOK;
+    return ESABI_OK;
 }
 
 /* arrSort(packed, len) -> packed, ES ToString order (§4). */
-ESARR_API long arrSort(TaggedData* argv, long argc, TaggedData* retval)
+ESABI_DIRECT_FUNCTION(arrSort)
 {
     const char* in;
     size_t inlen;
@@ -492,11 +488,11 @@ ESARR_API long arrSort(TaggedData* argv, long argc, TaggedData* retval)
     EsarrSortItem* items;
     char* out;
     long i;
-    if (argc != 2 || argv[0].type != kTypeString) {
-        return kESErrBadArgumentList;
+    if (argc != 2 || argv[0].type != ESABI_TYPE_STRING) {
+        return ESABI_ERR_BAD_ARGUMENTS;
     }
     len = esarr_arg_as_long(&argv[1]);
-    in = argv[0].data.string;
+    in = argv[0].payload.string_value;
     inlen = esarr_strlen(in);
     vals = (long*)esarr_malloc(ESARR_MAX_ELEMS * sizeof(long));
     if (vals == NULL) {
@@ -526,13 +522,12 @@ ESARR_API long arrSort(TaggedData* argv, long argc, TaggedData* retval)
     if (out == NULL) {
         return ESARR_ERR_NO_MEM;
     }
-    retval->type = kTypeString;
-    retval->data.string = out;
-    return kESErrOK;
+    esabi_value_set_string(retval, out);
+    return ESABI_OK;
 }
 
 /* arrReverse(packed, len) -> packed, reversed. */
-ESARR_API long arrReverse(TaggedData* argv, long argc, TaggedData* retval)
+ESABI_DIRECT_FUNCTION(arrReverse)
 {
     const char* in;
     size_t inlen;
@@ -541,11 +536,11 @@ ESARR_API long arrReverse(TaggedData* argv, long argc, TaggedData* retval)
     long* vals;
     char* out;
     long i;
-    if (argc != 2 || argv[0].type != kTypeString) {
-        return kESErrBadArgumentList;
+    if (argc != 2 || argv[0].type != ESABI_TYPE_STRING) {
+        return ESABI_ERR_BAD_ARGUMENTS;
     }
     len = esarr_arg_as_long(&argv[1]);
-    in = argv[0].data.string;
+    in = argv[0].payload.string_value;
     inlen = esarr_strlen(in);
     vals = (long*)esarr_malloc(ESARR_MAX_ELEMS * sizeof(long));
     if (vals == NULL) {
@@ -566,14 +561,13 @@ ESARR_API long arrReverse(TaggedData* argv, long argc, TaggedData* retval)
     if (out == NULL) {
         return ESARR_ERR_NO_MEM;
     }
-    retval->type = kTypeString;
-    retval->data.string = out;
-    return kESErrOK;
+    esabi_value_set_string(retval, out);
+    return ESABI_OK;
 }
 
 /* arrJoin(packed, len, sep) -> string; elements' ES decimals joined by sep
    verbatim (doc §4.4). */
-ESARR_API long arrJoin(TaggedData* argv, long argc, TaggedData* retval)
+ESABI_DIRECT_FUNCTION(arrJoin)
 {
     const char* in;
     const char* sep;
@@ -584,12 +578,12 @@ ESARR_API long arrJoin(TaggedData* argv, long argc, TaggedData* retval)
     char* out;
     size_t outlen = 0;
     long i;
-    if (argc != 3 || argv[0].type != kTypeString || argv[2].type != kTypeString) {
-        return kESErrBadArgumentList;
+    if (argc != 3 || argv[0].type != ESABI_TYPE_STRING || argv[2].type != ESABI_TYPE_STRING) {
+        return ESABI_ERR_BAD_ARGUMENTS;
     }
     len = esarr_arg_as_long(&argv[1]);
-    in = argv[0].data.string;
-    sep = argv[2].data.string;
+    in = argv[0].payload.string_value;
+    sep = argv[2].payload.string_value;
     inlen = esarr_strlen(in);
     seplen = esarr_strlen(sep);
     vals = (long*)esarr_malloc(ESARR_MAX_ELEMS * sizeof(long));
@@ -641,13 +635,12 @@ ESARR_API long arrJoin(TaggedData* argv, long argc, TaggedData* retval)
         out[o] = '\0';
     }
     esarr_free(vals);
-    retval->type = kTypeString;
-    retval->data.string = out;
-    return kESErrOK;
+    esabi_value_set_string(retval, out);
+    return ESABI_OK;
 }
 
 /* shared indexOf/lastIndexOf/includes core */
-static long esarr_find_core(const TaggedData* argv, long argc, int last, int include)
+static long esarr_find_core(const esabi_value* argv, long argc, int last, int include)
 {
     const char* in;
     size_t inlen;
@@ -656,12 +649,12 @@ static long esarr_find_core(const TaggedData* argv, long argc, int last, int inc
     long* vals;
     long search;
     long k;
-    if (argc != 3 || argv[0].type != kTypeString) {
+    if (argc != 3 || argv[0].type != ESABI_TYPE_STRING) {
         return -2; /* bad args sentinel */
     }
     len = esarr_arg_as_long(&argv[1]);
     search = esarr_arg_as_long(&argv[2]);
-    in = argv[0].data.string;
+    in = argv[0].payload.string_value;
     inlen = esarr_strlen(in);
     vals = (long*)esarr_malloc(ESARR_MAX_ELEMS * sizeof(long));
     if (vals == NULL) {
@@ -705,11 +698,11 @@ static long esarr_find_core(const TaggedData* argv, long argc, int last, int inc
 
 /* arrIndexOf(packed, len, search) -> int (export kept per §1.2; the lane
    is JSX-ONLY per §2.2 — the dispatch is disengaged) */
-ESARR_API long arrIndexOf(TaggedData* argv, long argc, TaggedData* retval)
+ESABI_DIRECT_FUNCTION(arrIndexOf)
 {
     long r = esarr_find_core(argv, argc, 0, 0);
     if (r == -2) {
-        return kESErrBadArgumentList;
+        return ESABI_ERR_BAD_ARGUMENTS;
     }
     if (r == -3) {
         return ESARR_ERR_NO_MEM;
@@ -717,17 +710,16 @@ ESARR_API long arrIndexOf(TaggedData* argv, long argc, TaggedData* retval)
     if (r == -4) {
         return ESARR_ERR_BAD_PAYLOAD;
     }
-    retval->type = kTypeInteger;
-    retval->data.intval = r;
-    return kESErrOK;
+    esabi_value_set_i32(retval, (esabi_i32)(r));
+    return ESABI_OK;
 }
 
 /* arrLastIndexOf(packed, len, search) -> int */
-ESARR_API long arrLastIndexOf(TaggedData* argv, long argc, TaggedData* retval)
+ESABI_DIRECT_FUNCTION(arrLastIndexOf)
 {
     long r = esarr_find_core(argv, argc, 1, 0);
     if (r == -2) {
-        return kESErrBadArgumentList;
+        return ESABI_ERR_BAD_ARGUMENTS;
     }
     if (r == -3) {
         return ESARR_ERR_NO_MEM;
@@ -735,17 +727,16 @@ ESARR_API long arrLastIndexOf(TaggedData* argv, long argc, TaggedData* retval)
     if (r == -4) {
         return ESARR_ERR_BAD_PAYLOAD;
     }
-    retval->type = kTypeInteger;
-    retval->data.intval = r;
-    return kESErrOK;
+    esabi_value_set_i32(retval, (esabi_i32)(r));
+    return ESABI_OK;
 }
 
 /* arrIncludes(packed, len, search) -> 1/0 (SameValueZero) */
-ESARR_API long arrIncludes(TaggedData* argv, long argc, TaggedData* retval)
+ESABI_DIRECT_FUNCTION(arrIncludes)
 {
     long r = esarr_find_core(argv, argc, 0, 1);
     if (r == -2) {
-        return kESErrBadArgumentList;
+        return ESABI_ERR_BAD_ARGUMENTS;
     }
     if (r == -3) {
         return ESARR_ERR_NO_MEM;
@@ -753,9 +744,8 @@ ESARR_API long arrIncludes(TaggedData* argv, long argc, TaggedData* retval)
     if (r == -4) {
         return ESARR_ERR_BAD_PAYLOAD;
     }
-    retval->type = kTypeInteger;
-    retval->data.intval = r;
-    return kESErrOK;
+    esabi_value_set_i32(retval, (esabi_i32)(r));
+    return ESABI_OK;
 }
 
 /* ---- DllMain (freestanding: no CRT init needed) ---- */

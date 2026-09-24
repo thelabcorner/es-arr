@@ -48,23 +48,10 @@ __declspec(dllimport) char* __cdecl GetCommandLineA(void);
 
 unsigned int _fltused = 0;
 
-typedef struct TaggedData {
-    union {
-        long intval;
-        double fltval;
-        char* string;
-        void* hObject;
-    } data;
-    long type;
-    long filler;
-} TaggedData;
+#include <esabi/esabi.h>
 
-#define kTypeUndefined 0
-#define kTypeString   4
-#define kTypeInteger  123
-
-typedef long (*ESFunc)(TaggedData*, long, TaggedData*);
-typedef void (*ESFreeFn)(void*);
+typedef esabi_error (ESABI_CALL *ESFunc)(esabi_value*, esabi_long, esabi_value*);
+typedef void (ESABI_CALL *ESFreeFn)(void*);
 
 #define IN_BUF (96u << 20)  /* 256k scan batch: 19 cmds x ~2.7MB b64 < 96MB */
 #define OUT_BUF (32u << 20)
@@ -306,7 +293,7 @@ void mainCRTStartup(void)
             long sepbytes = 0;
             long search = 0;
             int isScan = 0;
-            TaggedData argv[3], rv;
+            esabi_value argv[3], rv;
             long rc = 0;
             long reslen;
             long elen;
@@ -367,11 +354,11 @@ void mainCRTStartup(void)
                 p++;
             }
 
-            argv[0].type = kTypeString;
-            argv[0].data.string = (char*)g_chan;
-            argv[1].type = kTypeInteger;
-            argv[1].data.intval = len;
-            rv.type = kTypeUndefined;
+            argv[0].type = ESABI_TYPE_STRING;
+            argv[0].payload.string_value = (char*)g_chan;
+            argv[1].type = ESABI_TYPE_INTEGER;
+            argv[1].payload.signed_value = len;
+            rv.type = ESABI_TYPE_UNDEFINED;
             if (cmd[0] == 'S') {
                 rc = arrSort(argv, 2, &rv);
             }
@@ -379,23 +366,23 @@ void mainCRTStartup(void)
                 rc = arrReverse(argv, 2, &rv);
             }
             else if (cmd[0] == 'J') {
-                argv[2].type = kTypeString;
-                argv[2].data.string = (char*)g_sep;
+                argv[2].type = ESABI_TYPE_STRING;
+                argv[2].payload.string_value = (char*)g_sep;
                 rc = arrJoin(argv, 3, &rv);
             }
             else if (cmd[0] == 'I' && cmd[1] == 'D') { /* IDX */
-                argv[2].type = kTypeInteger;
-                argv[2].data.intval = search;
+                argv[2].type = ESABI_TYPE_INTEGER;
+                argv[2].payload.signed_value = search;
                 rc = arrIndexOf(argv, 3, &rv);
             }
             else if (cmd[0] == 'L' && cmd[1] == 'I') { /* LIDX */
-                argv[2].type = kTypeInteger;
-                argv[2].data.intval = search;
+                argv[2].type = ESABI_TYPE_INTEGER;
+                argv[2].payload.signed_value = search;
                 rc = arrLastIndexOf(argv, 3, &rv);
             }
             else if (cmd[0] == 'I' && cmd[1] == 'N') { /* INC */
-                argv[2].type = kTypeInteger;
-                argv[2].data.intval = search;
+                argv[2].type = ESABI_TYPE_INTEGER;
+                argv[2].payload.signed_value = search;
                 rc = arrIncludes(argv, 3, &rv);
             }
             else {
@@ -411,18 +398,18 @@ void mainCRTStartup(void)
             if (isScan) {
                 /* scan results are plain ints (index or 1/0): "OKI <n>" */
                 out_str("OKI ");
-                out_long(rv.data.intval);
+                out_long(rv.payload.signed_value);
                 out_c('\n');
                 continue;
             }
-            reslen = str_len(rv.data.string);
-            elen = b64_encode((const unsigned char*)rv.data.string, reslen, enc);
+            reslen = str_len(rv.payload.string_value);
+            elen = b64_encode((const unsigned char*)rv.payload.string_value, reslen, enc);
             out_str("OK ");
             for (k = 0; k < elen; k++) {
                 out_c(enc[k]);
             }
             out_c('\n');
-            ESFreeMem(rv.data.string);
+            ESFreeMem(rv.payload.string_value);
         }
     }
     flush_out();
