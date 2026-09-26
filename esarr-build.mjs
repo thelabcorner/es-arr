@@ -177,15 +177,10 @@ function buildAccel() {
   var accelOut = bundleText + '\n' + facadeText + '\n' + ACCELERATOR +
     '// ESARR.accel.jsx - self-extracting single-file bundle (espack 1+n + ESARR + native gate)\n';
   writeFileSync(join(DIST, 'ESARR.accel.jsx'), accelOut);
-  // Vendor copy for the COM tool (its session bootstrap can eval this bundle
-  // so the tool's session gets the accelerated facade).
-  var skillVendor = join(ROOT, '..', 'agent-skills', 'illustrator-com-automation-skill', 'vendor');
-  if (existsSync(skillVendor)) {
-    writeFileSync(join(skillVendor, 'ESARR.accel.jsx'), accelOut);
-    console.log('[esarr-build] vendored ESARR.accel.jsx -> ' + join(skillVendor, 'ESARR.accel.jsx'));
-  }
   console.log('[esarr-build] wrote ' + join(DIST, 'ESARR.accel.jsx') + ' (' + accelOut.length + ' bytes)');
-  minifyAccel(accelOut, skillVendor);
+  // Cross-repo COM-tool vendoring is intentionally NOT a build side effect.
+  // Run `node esarr-vendor-sync.mjs` explicitly after validation.
+  minifyAccel(accelOut);
 }
 
 // Minify the accelerated bundle via the adobe-extendscript-minification
@@ -193,7 +188,7 @@ function buildAccel() {
 // restore + node --check). The espack banner (leading block comment) is
 // extracted BEFORE minification and restored after - the conservative
 // config strips comments, and the banner identifies the generated artifact.
-function minifyAccel(accelOut, skillVendor) {
+function minifyAccel(accelOut) {
   var skillDir = join(ROOT, '..', 'agent-skills', 'adobe-extendscript-minification');
   var minifyScript = join(skillDir, 'scripts', 'minify-jsx.py');
   var minifyConfig = join(skillDir, 'configs', 'conservative.json');
@@ -213,10 +208,6 @@ function minifyAccel(accelOut, skillVendor) {
   var minOut = (banner ? banner + '\n' : '') + minBody;
   var minFinal = join(DIST, 'ESARR.accel.min.jsx');
   writeFileSync(minFinal, minOut, 'utf8');
-  if (skillVendor && existsSync(skillVendor)) {
-    writeFileSync(join(skillVendor, 'ESARR.accel.min.jsx'), minOut);
-    console.log('[esarr-build] vendored ESARR.accel.min.jsx -> ' + join(skillVendor, 'ESARR.accel.min.jsx'));
-  }
   console.log('[esarr-build] wrote ' + minFinal + ' (' + minOut.length + ' bytes, banner preserved)');
 }
 

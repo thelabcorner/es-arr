@@ -1,0 +1,4745 @@
+{
+ "vectors": 238,
+ "engine": "4.5.6",
+ "host": "Adobe Illustrator 30.6.0",
+ "report": {
+  "engine": "4.5.6",
+  "host": "Adobe Illustrator 30.6.0",
+  "results": [
+   {
+    "desc": "forEach sums dense",
+    "op": "forEach",
+    "pending": false,
+    "ok": true,
+    "result": 15
+   },
+   {
+    "desc": "forEach sparse visits only present",
+    "op": "forEach",
+    "pending": false,
+    "ok": true,
+    "result": 2
+   },
+   {
+    "desc": "forEach visits undefined elements",
+    "op": "forEach",
+    "pending": false,
+    "ok": true,
+    "result": 3
+   },
+   {
+    "desc": "forEach over string chars",
+    "op": "forEach",
+    "pending": false,
+    "ok": true,
+    "result": "a1b2c3"
+   },
+   {
+    "desc": "forEach over array-like object",
+    "op": "forEach",
+    "pending": false,
+    "ok": true,
+    "result": 60
+   },
+   {
+    "desc": "forEach thisArg bound",
+    "op": "forEach",
+    "pending": false,
+    "ok": true,
+    "result": "T@4"
+   },
+   {
+    "desc": "forEach(null) throws TypeError",
+    "op": "forEach",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "forEach non-callable throws",
+    "op": "forEach",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "map doubles",
+    "op": "map",
+    "pending": false,
+    "ok": true,
+    "result": [
+     2,
+     4,
+     6,
+     8,
+     10
+    ]
+   },
+   {
+    "desc": "map preserves holes",
+    "op": "map",
+    "pending": false,
+    "ok": true,
+    "result": [
+     null,
+     "x!",
+     null,
+     null,
+     "y!",
+     null
+    ]
+   },
+   {
+    "desc": "map skips undefined cleanly",
+    "op": "map",
+    "pending": false,
+    "ok": true,
+    "result": [
+     null,
+     null,
+     6
+    ]
+   },
+   {
+    "desc": "map over string",
+    "op": "map",
+    "pending": false,
+    "ok": true,
+    "result": [
+     "a1",
+     "b2",
+     "c3"
+    ]
+   },
+   {
+    "desc": "map over array-like",
+    "op": "map",
+    "pending": false,
+    "ok": true,
+    "result": [
+     11,
+     21,
+     31
+    ]
+   },
+   {
+    "desc": "map empty returns []",
+    "op": "map",
+    "pending": false,
+    "ok": true,
+    "result": []
+   },
+   {
+    "desc": "map thisArg bound",
+    "op": "map",
+    "pending": false,
+    "ok": true,
+    "result": [
+     "Ta0",
+     "Tb1",
+     "Tc2"
+    ]
+   },
+   {
+    "desc": "map(null) throws TypeError",
+    "op": "map",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "map non-callable throws",
+    "op": "map",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "filter evens",
+    "op": "filter",
+    "pending": false,
+    "ok": true,
+    "result": [
+     2,
+     4
+    ]
+   },
+   {
+    "desc": "filter preserves holes",
+    "op": "filter",
+    "pending": false,
+    "ok": true,
+    "result": [
+     "x",
+     "y"
+    ]
+   },
+   {
+    "desc": "filter truthy on undefined",
+    "op": "filter",
+    "pending": false,
+    "ok": true,
+    "result": [
+     3
+    ]
+   },
+   {
+    "desc": "filter array-like",
+    "op": "filter",
+    "pending": false,
+    "ok": true,
+    "result": [
+     20,
+     30
+    ]
+   },
+   {
+    "desc": "filter(null) throws TypeError",
+    "op": "filter",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "every all > 0",
+    "op": "every",
+    "pending": false,
+    "ok": true,
+    "result": true
+   },
+   {
+    "desc": "every fails at index 3",
+    "op": "every",
+    "pending": false,
+    "ok": true,
+    "result": false
+   },
+   {
+    "desc": "some finds 4",
+    "op": "some",
+    "pending": false,
+    "ok": true,
+    "result": true
+   },
+   {
+    "desc": "some misses 99",
+    "op": "some",
+    "pending": false,
+    "ok": true,
+    "result": false
+   },
+   {
+    "desc": "some on sparse skips holes",
+    "op": "some",
+    "pending": false,
+    "ok": true,
+    "result": true
+   },
+   {
+    "desc": "every(null) throws TypeError",
+    "op": "every",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "indexOf hit",
+    "op": "indexOf",
+    "pending": false,
+    "ok": true,
+    "result": 2
+   },
+   {
+    "desc": "indexOf miss",
+    "op": "indexOf",
+    "pending": false,
+    "ok": true,
+    "result": -1
+   },
+   {
+    "desc": "indexOf from 3",
+    "op": "indexOf",
+    "pending": false,
+    "ok": true,
+    "result": 4
+   },
+   {
+    "desc": "indexOf from -2",
+    "op": "indexOf",
+    "pending": false,
+    "ok": true,
+    "result": 3
+   },
+   {
+    "desc": "indexOf from -Infinity",
+    "op": "indexOf",
+    "pending": false,
+    "ok": true,
+    "result": 0
+   },
+   {
+    "desc": "indexOf from +Infinity",
+    "op": "indexOf",
+    "pending": false,
+    "ok": true,
+    "result": -1
+   },
+   {
+    "desc": "indexOf from NaN",
+    "op": "indexOf",
+    "pending": false,
+    "ok": true,
+    "result": 1
+   },
+   {
+    "desc": "indexOf from undefined",
+    "op": "indexOf",
+    "pending": false,
+    "ok": true,
+    "result": 1
+   },
+   {
+    "desc": "indexOf fractional 2.9",
+    "op": "indexOf",
+    "pending": false,
+    "ok": true,
+    "result": 3
+   },
+   {
+    "desc": "indexOf fractional 3.7 truncates",
+    "op": "indexOf",
+    "pending": false,
+    "ok": true,
+    "result": 4
+   },
+   {
+    "desc": "indexOf negative fractional",
+    "op": "indexOf",
+    "pending": false,
+    "ok": true,
+    "result": -1
+   },
+   {
+    "desc": "indexOf string fromIndex",
+    "op": "indexOf",
+    "pending": false,
+    "ok": true,
+    "result": 1
+   },
+   {
+    "desc": "indexOf from len",
+    "op": "indexOf",
+    "pending": false,
+    "ok": true,
+    "result": -1
+   },
+   {
+    "desc": "indexOf from len+5",
+    "op": "indexOf",
+    "pending": false,
+    "ok": true,
+    "result": -1
+   },
+   {
+    "desc": "indexOf from -len-5",
+    "op": "indexOf",
+    "pending": false,
+    "ok": true,
+    "result": 0
+   },
+   {
+    "desc": "indexOf strict no coercion",
+    "op": "indexOf",
+    "pending": false,
+    "ok": true,
+    "result": -1
+   },
+   {
+    "desc": "indexOf finds undefined element",
+    "op": "indexOf",
+    "pending": false,
+    "ok": true,
+    "result": 0
+   },
+   {
+    "desc": "indexOf hole is not undefined",
+    "op": "indexOf",
+    "pending": false,
+    "ok": true,
+    "result": -1
+   },
+   {
+    "desc": "indexOf empty",
+    "op": "indexOf",
+    "pending": false,
+    "ok": true,
+    "result": -1
+   },
+   {
+    "desc": "indexOf null not present",
+    "op": "indexOf",
+    "pending": false,
+    "ok": true,
+    "result": -1
+   },
+   {
+    "desc": "indexOf(null) throws TypeError",
+    "op": "indexOf",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "indexOf mixed values",
+    "op": "indexOf",
+    "pending": false,
+    "ok": true,
+    "result": 2
+   },
+   {
+    "desc": "lastIndexOf hit",
+    "op": "lastIndexOf",
+    "pending": false,
+    "ok": true,
+    "result": 2
+   },
+   {
+    "desc": "lastIndexOf picks last duplicate",
+    "op": "lastIndexOf",
+    "pending": false,
+    "ok": true,
+    "result": 2
+   },
+   {
+    "desc": "lastIndexOf from -2",
+    "op": "lastIndexOf",
+    "pending": false,
+    "ok": true,
+    "result": 1
+   },
+   {
+    "desc": "lastIndexOf from 2",
+    "op": "lastIndexOf",
+    "pending": false,
+    "ok": true,
+    "result": -1
+   },
+   {
+    "desc": "lastIndexOf absent fromIndex",
+    "op": "lastIndexOf",
+    "pending": false,
+    "ok": true,
+    "result": 4
+   },
+   {
+    "desc": "lastIndexOf from len clamps",
+    "op": "lastIndexOf",
+    "pending": false,
+    "ok": true,
+    "result": 4
+   },
+   {
+    "desc": "lastIndexOf from +Infinity",
+    "op": "lastIndexOf",
+    "pending": false,
+    "ok": true,
+    "result": 4
+   },
+   {
+    "desc": "lastIndexOf from -Infinity",
+    "op": "lastIndexOf",
+    "pending": false,
+    "ok": true,
+    "result": -1
+   },
+   {
+    "desc": "lastIndexOf from NaN",
+    "op": "lastIndexOf",
+    "pending": false,
+    "ok": true,
+    "result": -1
+   },
+   {
+    "desc": "lastIndexOf from 0",
+    "op": "lastIndexOf",
+    "pending": false,
+    "ok": true,
+    "result": 0
+   },
+   {
+    "desc": "lastIndexOf from -1",
+    "op": "lastIndexOf",
+    "pending": false,
+    "ok": true,
+    "result": 4
+   },
+   {
+    "desc": "lastIndexOf from -len-1",
+    "op": "lastIndexOf",
+    "pending": false,
+    "ok": true,
+    "result": -1
+   },
+   {
+    "desc": "lastIndexOf fractional 3.9",
+    "op": "lastIndexOf",
+    "pending": false,
+    "ok": true,
+    "result": 1
+   },
+   {
+    "desc": "lastIndexOf finds undefined element",
+    "op": "lastIndexOf",
+    "pending": false,
+    "ok": true,
+    "result": 1
+   },
+   {
+    "desc": "lastIndexOf hole is not undefined",
+    "op": "lastIndexOf",
+    "pending": false,
+    "ok": true,
+    "result": -1
+   },
+   {
+    "desc": "lastIndexOf empty",
+    "op": "lastIndexOf",
+    "pending": false,
+    "ok": true,
+    "result": -1
+   },
+   {
+    "desc": "lastIndexOf mixed values",
+    "op": "lastIndexOf",
+    "pending": false,
+    "ok": true,
+    "result": 2
+   },
+   {
+    "desc": "reduce sum with init",
+    "op": "reduce",
+    "pending": false,
+    "ok": true,
+    "result": 15
+   },
+   {
+    "desc": "reduce sum no init",
+    "op": "reduce",
+    "pending": false,
+    "ok": true,
+    "result": 15
+   },
+   {
+    "desc": "reduce product",
+    "op": "reduce",
+    "pending": false,
+    "ok": true,
+    "result": 120
+   },
+   {
+    "desc": "reduce concat strings",
+    "op": "reduce",
+    "pending": false,
+    "ok": true,
+    "result": "+abc"
+   },
+   {
+    "desc": "reduce no init skips holes",
+    "op": "reduce",
+    "pending": false,
+    "ok": true,
+    "result": "xy"
+   },
+   {
+    "desc": "reduce with init on sparse",
+    "op": "reduce",
+    "pending": false,
+    "ok": true,
+    "result": "zxy"
+   },
+   {
+    "desc": "reduce single element no init",
+    "op": "reduce",
+    "pending": false,
+    "ok": true,
+    "result": 42
+   },
+   {
+    "desc": "reduce empty with init",
+    "op": "reduce",
+    "pending": false,
+    "ok": true,
+    "result": 7
+   },
+   {
+    "desc": "reduce empty no init throws",
+    "op": "reduce",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "reduce all-sparse no init throws",
+    "op": "reduce",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "reduce undefined-first element no init",
+    "op": "reduce",
+    "pending": false,
+    "ok": true,
+    "result": null
+   },
+   {
+    "desc": "reduce(null) throws TypeError",
+    "op": "reduce",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "reduce non-callable throws",
+    "op": "reduce",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "reduceRight order",
+    "op": "reduceRight",
+    "pending": false,
+    "ok": true,
+    "result": "cba"
+   },
+   {
+    "desc": "reduceRight sum",
+    "op": "reduceRight",
+    "pending": false,
+    "ok": true,
+    "result": 15
+   },
+   {
+    "desc": "reduceRight no init",
+    "op": "reduceRight",
+    "pending": false,
+    "ok": true,
+    "result": 15
+   },
+   {
+    "desc": "reduceRight sparse no init",
+    "op": "reduceRight",
+    "pending": false,
+    "ok": true,
+    "result": "yx"
+   },
+   {
+    "desc": "reduceRight empty throws",
+    "op": "reduceRight",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "reduceRight empty with init",
+    "op": "reduceRight",
+    "pending": false,
+    "ok": true,
+    "result": 7
+   },
+   {
+    "desc": "isArray true on array",
+    "op": "isArray",
+    "pending": false,
+    "ok": true,
+    "result": true
+   },
+   {
+    "desc": "isArray false on array-like",
+    "op": "isArray",
+    "pending": false,
+    "ok": true,
+    "result": false
+   },
+   {
+    "desc": "isArray false on string",
+    "op": "isArray",
+    "pending": false,
+    "ok": true,
+    "result": false
+   },
+   {
+    "desc": "isArray false on null",
+    "op": "isArray",
+    "pending": false,
+    "ok": true,
+    "result": false
+   },
+   {
+    "desc": "isArray false on number 7",
+    "op": "isArray",
+    "pending": false,
+    "ok": true,
+    "result": false
+   },
+   {
+    "desc": "isArray false on undefined",
+    "op": "isArray",
+    "pending": false,
+    "ok": true,
+    "result": false
+   },
+   {
+    "desc": "isArray false on arguments-like",
+    "op": "isArray",
+    "pending": false,
+    "ok": true,
+    "result": false
+   },
+   {
+    "desc": "every no thisArg",
+    "op": "every",
+    "pending": false,
+    "ok": true,
+    "result": true
+   },
+   {
+    "desc": "some with object elements",
+    "op": "some",
+    "pending": false,
+    "ok": true,
+    "result": true
+   },
+   {
+    "desc": "concat flattens one level",
+    "op": "concat",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7
+    ]
+   },
+   {
+    "desc": "concat scalars appended",
+    "op": "concat",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     2,
+     3,
+     4,
+     5
+    ]
+   },
+   {
+    "desc": "concat empty receiver",
+    "op": "concat",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1
+    ]
+   },
+   {
+    "desc": "concat on array-like appends object (spec: no spread of array-likes)",
+    "op": "concat",
+    "pending": false,
+    "ok": true,
+    "result": [
+     {
+      "0": 10,
+      "1": 20,
+      "2": 30,
+      "length": 3
+     }
+    ]
+   },
+   {
+    "desc": "concat does not deep flatten",
+    "op": "concat",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     [
+      2
+     ]
+    ]
+   },
+   {
+    "desc": "concat null and undefined elements",
+    "op": "concat",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     null,
+     null
+    ]
+   },
+   {
+    "desc": "concat no args returns copy",
+    "op": "concat",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     2,
+     3,
+     4,
+     5
+    ]
+   },
+   {
+    "desc": "concat(null) throws TypeError",
+    "op": "concat",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "join default separator",
+    "op": "join",
+    "pending": false,
+    "ok": true,
+    "result": "1,2,3,4,5"
+   },
+   {
+    "desc": "join hyphen",
+    "op": "join",
+    "pending": false,
+    "ok": true,
+    "result": "a-b-c"
+   },
+   {
+    "desc": "join empty separator",
+    "op": "join",
+    "pending": false,
+    "ok": true,
+    "result": "ab"
+   },
+   {
+    "desc": "join null and undefined become empty",
+    "op": "join",
+    "pending": false,
+    "ok": true,
+    "result": "1---3"
+   },
+   {
+    "desc": "join holes become empty",
+    "op": "join",
+    "pending": false,
+    "ok": true,
+    "result": ",x,,,y,"
+   },
+   {
+    "desc": "join nested arrays toString",
+    "op": "join",
+    "pending": false,
+    "ok": true,
+    "result": "1-2,3-4"
+   },
+   {
+    "desc": "join separator 0 is \"0\"",
+    "op": "join",
+    "pending": false,
+    "ok": true,
+    "result": "102"
+   },
+   {
+    "desc": "join empty array",
+    "op": "join",
+    "pending": false,
+    "ok": true,
+    "result": ""
+   },
+   {
+    "desc": "join multi-char separator",
+    "op": "join",
+    "pending": false,
+    "ok": true,
+    "result": "1::-2::3"
+   },
+   {
+    "desc": "join negative values (design Â§4.4)",
+    "op": "join",
+    "pending": false,
+    "ok": true,
+    "result": "-1,0,-2147483648"
+   },
+   {
+    "desc": "join(string) throws TypeError",
+    "op": "join",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "pop returns last",
+    "op": "pop",
+    "pending": false,
+    "ok": true,
+    "result": 5,
+    "state": [
+     1,
+     2,
+     3,
+     4
+    ]
+   },
+   {
+    "desc": "pop empty returns undefined",
+    "op": "pop",
+    "pending": false,
+    "ok": true,
+    "state": []
+   },
+   {
+    "desc": "push returns new length",
+    "op": "push",
+    "pending": false,
+    "ok": true,
+    "result": 4,
+    "state": [
+     1,
+     2,
+     3,
+     4
+    ]
+   },
+   {
+    "desc": "push single returns length",
+    "op": "push",
+    "pending": false,
+    "ok": true,
+    "result": 1,
+    "state": [
+     9
+    ]
+   },
+   {
+    "desc": "shift returns first",
+    "op": "shift",
+    "pending": false,
+    "ok": true,
+    "result": 1,
+    "state": [
+     2,
+     3,
+     4,
+     5
+    ]
+   },
+   {
+    "desc": "shift empty returns undefined",
+    "op": "shift",
+    "pending": false,
+    "ok": true,
+    "state": []
+   },
+   {
+    "desc": "unshift returns length",
+    "op": "unshift",
+    "pending": false,
+    "ok": true,
+    "result": 4,
+    "state": [
+     0,
+     1,
+     2,
+     3
+    ]
+   },
+   {
+    "desc": "unshift empty",
+    "op": "unshift",
+    "pending": false,
+    "ok": true,
+    "result": 1,
+    "state": [
+     7
+    ]
+   },
+   {
+    "desc": "reverse mutates and returns same",
+    "op": "reverse",
+    "pending": false,
+    "ok": true,
+    "result": [
+     5,
+     4,
+     3,
+     2,
+     1
+    ],
+    "state": [
+     5,
+     4,
+     3,
+     2,
+     1
+    ]
+   },
+   {
+    "desc": "reverse empty",
+    "op": "reverse",
+    "pending": false,
+    "ok": true,
+    "result": [],
+    "state": []
+   },
+   {
+    "desc": "pop(null) throws TypeError",
+    "op": "pop",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "push(null) throws TypeError",
+    "op": "push",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "slice copies",
+    "op": "slice",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     2,
+     3,
+     4,
+     5
+    ]
+   },
+   {
+    "desc": "slice start/end",
+    "op": "slice",
+    "pending": false,
+    "ok": true,
+    "result": [
+     2,
+     3
+    ]
+   },
+   {
+    "desc": "slice negative start",
+    "op": "slice",
+    "pending": false,
+    "ok": true,
+    "result": [
+     4,
+     5
+    ]
+   },
+   {
+    "desc": "slice beyond end is empty",
+    "op": "slice",
+    "pending": false,
+    "ok": true,
+    "result": []
+   },
+   {
+    "desc": "slice before start is full copy",
+    "op": "slice",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     2,
+     3,
+     4,
+     5
+    ]
+   },
+   {
+    "desc": "slice end negative",
+    "op": "slice",
+    "pending": false,
+    "ok": true,
+    "result": [
+     2,
+     3,
+     4
+    ]
+   },
+   {
+    "desc": "slice on string array-like",
+    "op": "slice",
+    "pending": false,
+    "ok": true,
+    "result": [
+     "a",
+     "b",
+     "c"
+    ]
+   },
+   {
+    "desc": "slice preserves holes",
+    "op": "slice",
+    "pending": false,
+    "ok": true,
+    "result": [
+     "x",
+     null,
+     null,
+     "y"
+    ]
+   },
+   {
+    "desc": "slice(null) throws TypeError",
+    "op": "slice",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "sort default ToString order",
+    "op": "sort",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     10,
+     2,
+     9
+    ],
+    "state": [
+     1,
+     10,
+     2,
+     9
+    ]
+   },
+   {
+    "desc": "sort powers of 10 mixed with small ints (ToString)",
+    "op": "sort",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     10,
+     100,
+     1000,
+     2,
+     20
+    ],
+    "state": [
+     1,
+     10,
+     100,
+     1000,
+     2,
+     20
+    ]
+   },
+   {
+    "desc": "sort negative ints mixed with positives (ToString: -2 < -5 < 0 < 10 < 3)",
+    "op": "sort",
+    "pending": false,
+    "ok": true,
+    "result": [
+     -2,
+     -5,
+     0,
+     10,
+     3
+    ],
+    "state": [
+     -2,
+     -5,
+     0,
+     10,
+     3
+    ]
+   },
+   {
+    "desc": "sort duplicates",
+    "op": "sort",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     1,
+     2,
+     2
+    ],
+    "state": [
+     1,
+     1,
+     2,
+     2
+    ]
+   },
+   {
+    "desc": "sort max/min int32",
+    "op": "sort",
+    "pending": false,
+    "ok": true,
+    "result": [
+     -2147483648,
+     0,
+     2147483647
+    ],
+    "state": [
+     -2147483648,
+     0,
+     2147483647
+    ]
+   },
+   {
+    "desc": "sort mixed digit lengths",
+    "op": "sort",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     9,
+     99,
+     999,
+     9999
+    ],
+    "state": [
+     1,
+     9,
+     99,
+     999,
+     9999
+    ]
+   },
+   {
+    "desc": "sort numeric compareFn",
+    "op": "sort",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     2,
+     9,
+     10
+    ],
+    "state": [
+     1,
+     2,
+     9,
+     10
+    ]
+   },
+   {
+    "desc": "sort mixed types ToString",
+    "op": "sort",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     5,
+     null,
+     "two",
+     null
+    ],
+    "state": [
+     1,
+     5,
+     null,
+     "two",
+     null
+    ]
+   },
+   {
+    "desc": "sort NaN/Infinity/-0 ToString",
+    "op": "sort",
+    "pending": false,
+    "ok": true,
+    "result": [
+     null,
+     0,
+     0,
+     1,
+     null,
+     null
+    ],
+    "state": [
+     null,
+     0,
+     0,
+     1,
+     null,
+     null
+    ]
+   },
+   {
+    "desc": "sort sparse: values compact front, holes stay holes at end (V8 verified)",
+    "op": "sort",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     3,
+     null,
+     null
+    ],
+    "state": [
+     1,
+     3,
+     null,
+     null
+    ]
+   },
+   {
+    "desc": "sort comparator mixed numbers and strings",
+    "op": "sort",
+    "pending": false,
+    "ok": true,
+    "result": [
+     0,
+     "2",
+     1,
+     3
+    ],
+    "state": [
+     0,
+     "2",
+     1,
+     3
+    ]
+   },
+   {
+    "desc": "sort comparator stability",
+    "op": "sort",
+    "pending": false,
+    "ok": true,
+    "result": [
+     {
+      "k": 0,
+      "id": 2
+     },
+     {
+      "k": 1,
+      "id": 0
+     },
+     {
+      "k": 1,
+      "id": 1
+     }
+    ],
+    "state": [
+     {
+      "k": 0,
+      "id": 2
+     },
+     {
+      "k": 1,
+      "id": 0
+     },
+     {
+      "k": 1,
+      "id": 1
+     }
+    ]
+   },
+   {
+    "desc": "sort comparator NaN pins deterministic order (carve-out D7)",
+    "op": "sort",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     3,
+     null
+    ],
+    "state": [
+     1,
+     3,
+     null
+    ]
+   },
+   {
+    "desc": "sort array-like object",
+    "op": "sort",
+    "pending": false,
+    "ok": true,
+    "result": {
+     "0": 1,
+     "1": 2,
+     "2": 3,
+     "length": 3
+    },
+    "state": {
+     "0": 1,
+     "1": 2,
+     "2": 3,
+     "length": 3
+    }
+   },
+   {
+    "desc": "sort(null) throws TypeError",
+    "op": "sort",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "sort non-callable compareFn throws",
+    "op": "sort",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "splice removes range",
+    "op": "splice",
+    "pending": false,
+    "ok": true,
+    "result": [
+     2,
+     3
+    ],
+    "state": [
+     1,
+     4
+    ]
+   },
+   {
+    "desc": "splice inserts",
+    "op": "splice",
+    "pending": false,
+    "ok": true,
+    "result": [],
+    "state": [
+     1,
+     "a",
+     "b",
+     2,
+     3
+    ]
+   },
+   {
+    "desc": "splice negative start",
+    "op": "splice",
+    "pending": false,
+    "ok": true,
+    "result": [
+     3
+    ],
+    "state": [
+     1,
+     2
+    ]
+   },
+   {
+    "desc": "splice absent deleteCount deletes to end",
+    "op": "splice",
+    "pending": false,
+    "ok": true,
+    "result": [
+     2,
+     3
+    ],
+    "state": [
+     1
+    ]
+   },
+   {
+    "desc": "splice replace",
+    "op": "splice",
+    "pending": false,
+    "ok": true,
+    "result": [
+     2
+    ],
+    "state": [
+     1,
+     9,
+     3
+    ]
+   },
+   {
+    "desc": "splice empty",
+    "op": "splice",
+    "pending": false,
+    "ok": true,
+    "result": [],
+    "state": [
+     "x"
+    ]
+   },
+   {
+    "desc": "splice(null) throws TypeError",
+    "op": "splice",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "toString joins with comma",
+    "op": "toString",
+    "pending": false,
+    "ok": true,
+    "result": "1,2,3,4,5"
+   },
+   {
+    "desc": "toString nested arrays",
+    "op": "toString",
+    "pending": false,
+    "ok": true,
+    "result": "1,2,3"
+   },
+   {
+    "desc": "toString undefined becomes empty",
+    "op": "toString",
+    "pending": false,
+    "ok": true,
+    "result": "1,,2"
+   },
+   {
+    "desc": "toString on plain object falls back to Object tag",
+    "op": "toString",
+    "pending": false,
+    "ok": true,
+    "result": "[object Object]"
+   },
+   {
+    "desc": "toString(null) throws TypeError",
+    "op": "toString",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "find first even",
+    "op": "find",
+    "pending": false,
+    "ok": true,
+    "result": 2
+   },
+   {
+    "desc": "find missing returns undefined",
+    "op": "find",
+    "pending": false,
+    "ok": true
+   },
+   {
+    "desc": "find on sparse skips holes",
+    "op": "find",
+    "pending": false,
+    "ok": true,
+    "result": "x"
+   },
+   {
+    "desc": "find on array-like",
+    "op": "find",
+    "pending": false,
+    "ok": true,
+    "result": 20
+   },
+   {
+    "desc": "find(null) throws TypeError",
+    "op": "find",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "find non-callable throws",
+    "op": "find",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "findIndex first even",
+    "op": "findIndex",
+    "pending": false,
+    "ok": true,
+    "result": 1
+   },
+   {
+    "desc": "findIndex missing returns -1",
+    "op": "findIndex",
+    "pending": false,
+    "ok": true,
+    "result": -1
+   },
+   {
+    "desc": "findIndex on sparse skips holes",
+    "op": "findIndex",
+    "pending": false,
+    "ok": true,
+    "result": 1
+   },
+   {
+    "desc": "findIndex(null) throws TypeError",
+    "op": "findIndex",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "findIndex non-callable throws",
+    "op": "findIndex",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "fill all",
+    "op": "fill",
+    "pending": false,
+    "ok": true,
+    "result": [
+     0,
+     0,
+     0
+    ],
+    "state": [
+     0,
+     0,
+     0
+    ]
+   },
+   {
+    "desc": "fill from start",
+    "op": "fill",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     0,
+     0
+    ],
+    "state": [
+     1,
+     0,
+     0
+    ]
+   },
+   {
+    "desc": "fill range",
+    "op": "fill",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     0,
+     3
+    ],
+    "state": [
+     1,
+     0,
+     3
+    ]
+   },
+   {
+    "desc": "fill negative start",
+    "op": "fill",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     0,
+     0
+    ],
+    "state": [
+     1,
+     0,
+     0
+    ]
+   },
+   {
+    "desc": "fill end before start noop",
+    "op": "fill",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     2,
+     3
+    ],
+    "state": [
+     1,
+     2,
+     3
+    ]
+   },
+   {
+    "desc": "fill NaN start is 0",
+    "op": "fill",
+    "pending": false,
+    "ok": true,
+    "result": [
+     9,
+     9,
+     9
+    ],
+    "state": [
+     9,
+     9,
+     9
+    ]
+   },
+   {
+    "desc": "fill fills holes",
+    "op": "fill",
+    "pending": false,
+    "ok": true,
+    "result": [
+     7,
+     7,
+     7
+    ],
+    "state": [
+     7,
+     7,
+     7
+    ]
+   },
+   {
+    "desc": "fill explicit undefined end is treated as len",
+    "op": "fill",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     0,
+     0
+    ],
+    "state": [
+     1,
+     0,
+     0
+    ]
+   },
+   {
+    "desc": "fill(null) throws TypeError",
+    "op": "fill",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "copyWithin basic",
+    "op": "copyWithin",
+    "pending": false,
+    "ok": true,
+    "result": [
+     4,
+     5,
+     3,
+     4,
+     5
+    ],
+    "state": [
+     4,
+     5,
+     3,
+     4,
+     5
+    ]
+   },
+   {
+    "desc": "copyWithin range",
+    "op": "copyWithin",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     4,
+     5,
+     4,
+     5
+    ],
+    "state": [
+     1,
+     4,
+     5,
+     4,
+     5
+    ]
+   },
+   {
+    "desc": "copyWithin negative target/start/end",
+    "op": "copyWithin",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     2,
+     3,
+     3,
+     4
+    ],
+    "state": [
+     1,
+     2,
+     3,
+     3,
+     4
+    ]
+   },
+   {
+    "desc": "copyWithin negative start only",
+    "op": "copyWithin",
+    "pending": false,
+    "ok": true,
+    "result": [
+     4,
+     5,
+     3,
+     4,
+     5
+    ],
+    "state": [
+     4,
+     5,
+     3,
+     4,
+     5
+    ]
+   },
+   {
+    "desc": "copyWithin end before start noop",
+    "op": "copyWithin",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     2,
+     3
+    ],
+    "state": [
+     1,
+     2,
+     3
+    ]
+   },
+   {
+    "desc": "copyWithin target beyond length noop",
+    "op": "copyWithin",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     2,
+     3
+    ],
+    "state": [
+     1,
+     2,
+     3
+    ]
+   },
+   {
+    "desc": "copyWithin(null) throws TypeError",
+    "op": "copyWithin",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "includes hit",
+    "op": "includes",
+    "pending": false,
+    "ok": true,
+    "result": true
+   },
+   {
+    "desc": "includes miss",
+    "op": "includes",
+    "pending": false,
+    "ok": true,
+    "result": false
+   },
+   {
+    "desc": "includes NaN matches NaN",
+    "op": "includes",
+    "pending": false,
+    "ok": true,
+    "result": true
+   },
+   {
+    "desc": "includes -0 matches 0",
+    "op": "includes",
+    "pending": false,
+    "ok": true,
+    "result": true
+   },
+   {
+    "desc": "includes no coercion",
+    "op": "includes",
+    "pending": false,
+    "ok": true,
+    "result": false
+   },
+   {
+    "desc": "includes fromIndex",
+    "op": "includes",
+    "pending": false,
+    "ok": true,
+    "result": false
+   },
+   {
+    "desc": "includes negative fromIndex",
+    "op": "includes",
+    "pending": false,
+    "ok": true,
+    "result": true
+   },
+   {
+    "desc": "includes beyond length",
+    "op": "includes",
+    "pending": false,
+    "ok": true,
+    "result": false
+   },
+   {
+    "desc": "includes finds undefined element",
+    "op": "includes",
+    "pending": false,
+    "ok": true,
+    "result": true
+   },
+   {
+    "desc": "includes matches holes as undefined (V8 behavior)",
+    "op": "includes",
+    "pending": false,
+    "ok": true,
+    "result": true
+   },
+   {
+    "desc": "includes on string array-like",
+    "op": "includes",
+    "pending": false,
+    "ok": true,
+    "result": true
+   },
+   {
+    "desc": "includes(null) throws TypeError",
+    "op": "includes",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "flat default depth 1",
+    "op": "flat",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     2,
+     [
+      3
+     ]
+    ]
+   },
+   {
+    "desc": "flat depth 2",
+    "op": "flat",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     2,
+     3,
+     [
+      4
+     ]
+    ]
+   },
+   {
+    "desc": "flat Infinity",
+    "op": "flat",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     2,
+     3,
+     4
+    ]
+   },
+   {
+    "desc": "flat removes holes",
+    "op": "flat",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     3
+    ]
+   },
+   {
+    "desc": "flat depth 0 no flatten",
+    "op": "flat",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     [
+      2
+     ]
+    ]
+   },
+   {
+    "desc": "flat negative depth no flatten",
+    "op": "flat",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     [
+      2
+     ]
+    ]
+   },
+   {
+    "desc": "flat explicit undefined depth is treated as 1",
+    "op": "flat",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     2
+    ]
+   },
+   {
+    "desc": "flat(null) throws TypeError",
+    "op": "flat",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "flatMap expands",
+    "op": "flatMap",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     10,
+     2,
+     20,
+     3,
+     30,
+     4,
+     40,
+     5,
+     50
+    ]
+   },
+   {
+    "desc": "flatMap scalar pairs",
+    "op": "flatMap",
+    "pending": false,
+    "ok": true,
+    "result": [
+     "1",
+     0,
+     "2",
+     1
+    ]
+   },
+   {
+    "desc": "flatMap empty",
+    "op": "flatMap",
+    "pending": false,
+    "ok": true,
+    "result": []
+   },
+   {
+    "desc": "flatMap(null) throws TypeError",
+    "op": "flatMap",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "flatMap non-callable throws",
+    "op": "flatMap",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "from string",
+    "op": "from",
+    "pending": false,
+    "ok": true,
+    "result": [
+     "a",
+     "b",
+     "c"
+    ]
+   },
+   {
+    "desc": "from array-like with mapFn",
+    "op": "from",
+    "pending": false,
+    "ok": true,
+    "result": [
+     "1#0",
+     "2#1",
+     "3#2"
+    ]
+   },
+   {
+    "desc": "from preserves holes as undefined elements (Node behavior)",
+    "op": "from",
+    "pending": false,
+    "ok": true,
+    "result": [
+     "1#0",
+     "undefined#1",
+     "3#2"
+    ]
+   },
+   {
+    "desc": "from without mapFn copies holes as undefined elements",
+    "op": "from",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     null,
+     3
+    ]
+   },
+   {
+    "desc": "from empty",
+    "op": "from",
+    "pending": false,
+    "ok": true,
+    "result": []
+   },
+   {
+    "desc": "from(null) throws TypeError",
+    "op": "from",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "of empty",
+    "op": "of",
+    "pending": false,
+    "ok": true,
+    "result": []
+   },
+   {
+    "desc": "of values",
+    "op": "of",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     "a",
+     null
+    ]
+   },
+   {
+    "desc": "of single undefined is an element",
+    "op": "of",
+    "pending": false,
+    "ok": true,
+    "result": [
+     null
+    ]
+   },
+   {
+    "desc": "of sparse-ish spread of values",
+    "op": "of",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     [
+      2
+     ],
+     3
+    ]
+   },
+   {
+    "desc": "entries sequence",
+    "op": "entries",
+    "pending": false,
+    "ok": true,
+    "result": [
+     [
+      0,
+      "a"
+     ],
+     [
+      1,
+      "b"
+     ],
+     [
+      2,
+      "c"
+     ]
+    ]
+   },
+   {
+    "desc": "entries yields undefined for holes",
+    "op": "entries",
+    "pending": false,
+    "ok": true,
+    "result": [
+     [
+      0,
+      null
+     ],
+     [
+      1,
+      null
+     ]
+    ]
+   },
+   {
+    "desc": "entries on array-like",
+    "op": "entries",
+    "pending": false,
+    "ok": true,
+    "result": [
+     [
+      0,
+      10
+     ],
+     [
+      1,
+      20
+     ],
+     [
+      2,
+      30
+     ]
+    ]
+   },
+   {
+    "desc": "entries on string",
+    "op": "entries",
+    "pending": false,
+    "ok": true,
+    "result": [
+     [
+      0,
+      "a"
+     ],
+     [
+      1,
+      "b"
+     ],
+     [
+      2,
+      "c"
+     ]
+    ]
+   },
+   {
+    "desc": "keys sequence",
+    "op": "keys",
+    "pending": false,
+    "ok": true,
+    "result": [
+     0,
+     1,
+     2
+    ]
+   },
+   {
+    "desc": "keys yields all indices for holes",
+    "op": "keys",
+    "pending": false,
+    "ok": true,
+    "result": [
+     0,
+     1
+    ]
+   },
+   {
+    "desc": "values sequence",
+    "op": "values",
+    "pending": false,
+    "ok": true,
+    "result": [
+     "a",
+     "b",
+     "c"
+    ]
+   },
+   {
+    "desc": "values yields undefined for holes",
+    "op": "values",
+    "pending": false,
+    "ok": true,
+    "result": [
+     null,
+     null
+    ]
+   },
+   {
+    "desc": "indexOf -0 matches 0 by strict equality",
+    "op": "indexOf",
+    "pending": false,
+    "ok": true,
+    "result": 0
+   },
+   {
+    "desc": "indexOf NaN never found (strict)",
+    "op": "indexOf",
+    "pending": false,
+    "ok": true,
+    "result": -1
+   },
+   {
+    "desc": "lastIndexOf from -0.5 returns -0 (ES5.1-exact, carve-out D3)",
+    "op": "lastIndexOf",
+    "pending": false,
+    "ok": true,
+    "result": 0
+   },
+   {
+    "desc": "lastIndexOf from -0 returns +0 (matches Node; || 0 fast path)",
+    "op": "lastIndexOf",
+    "pending": false,
+    "ok": true,
+    "result": 0
+   },
+   {
+    "desc": "lastIndexOf from 0.5 truncates to 0 and scans down",
+    "op": "lastIndexOf",
+    "pending": false,
+    "ok": true,
+    "result": -1
+   }
+  ],
+  "native": [
+   {
+    "desc": "forEach sums dense",
+    "op": "forEach",
+    "pending": false,
+    "ok": true,
+    "result": 15
+   },
+   {
+    "desc": "forEach sparse visits only present",
+    "op": "forEach",
+    "pending": false,
+    "ok": true,
+    "result": 2
+   },
+   {
+    "desc": "forEach visits undefined elements",
+    "op": "forEach",
+    "pending": false,
+    "ok": true,
+    "result": 3
+   },
+   {
+    "desc": "forEach over string chars",
+    "op": "forEach",
+    "pending": false,
+    "ok": true,
+    "result": "a1b2c3"
+   },
+   {
+    "desc": "forEach over array-like object",
+    "op": "forEach",
+    "pending": false,
+    "ok": true,
+    "result": 60
+   },
+   {
+    "desc": "forEach thisArg bound",
+    "op": "forEach",
+    "pending": false,
+    "ok": true,
+    "result": "T@4"
+   },
+   {
+    "desc": "forEach(null) throws TypeError",
+    "op": "forEach",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "forEach non-callable throws",
+    "op": "forEach",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "map doubles",
+    "op": "map",
+    "pending": false,
+    "ok": true,
+    "result": [
+     2,
+     4,
+     6,
+     8,
+     10
+    ]
+   },
+   {
+    "desc": "map preserves holes",
+    "op": "map",
+    "pending": false,
+    "ok": true,
+    "result": [
+     null,
+     "x!",
+     null,
+     null,
+     "y!",
+     null
+    ]
+   },
+   {
+    "desc": "map skips undefined cleanly",
+    "op": "map",
+    "pending": false,
+    "ok": true,
+    "result": [
+     null,
+     null,
+     6
+    ]
+   },
+   {
+    "desc": "map over string",
+    "op": "map",
+    "pending": false,
+    "ok": true,
+    "result": [
+     "a1",
+     "b2",
+     "c3"
+    ]
+   },
+   {
+    "desc": "map over array-like",
+    "op": "map",
+    "pending": false,
+    "ok": true,
+    "result": [
+     11,
+     21,
+     31
+    ]
+   },
+   {
+    "desc": "map empty returns []",
+    "op": "map",
+    "pending": false,
+    "ok": true,
+    "result": []
+   },
+   {
+    "desc": "map thisArg bound",
+    "op": "map",
+    "pending": false,
+    "ok": true,
+    "result": [
+     "Ta0",
+     "Tb1",
+     "Tc2"
+    ]
+   },
+   {
+    "desc": "map(null) throws TypeError",
+    "op": "map",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "map non-callable throws",
+    "op": "map",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "filter evens",
+    "op": "filter",
+    "pending": false,
+    "ok": true,
+    "result": [
+     2,
+     4
+    ]
+   },
+   {
+    "desc": "filter preserves holes",
+    "op": "filter",
+    "pending": false,
+    "ok": true,
+    "result": [
+     "x",
+     "y"
+    ]
+   },
+   {
+    "desc": "filter truthy on undefined",
+    "op": "filter",
+    "pending": false,
+    "ok": true,
+    "result": [
+     3
+    ]
+   },
+   {
+    "desc": "filter array-like",
+    "op": "filter",
+    "pending": false,
+    "ok": true,
+    "result": [
+     20,
+     30
+    ]
+   },
+   {
+    "desc": "filter(null) throws TypeError",
+    "op": "filter",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "every all > 0",
+    "op": "every",
+    "pending": false,
+    "ok": true,
+    "result": true
+   },
+   {
+    "desc": "every fails at index 3",
+    "op": "every",
+    "pending": false,
+    "ok": true,
+    "result": false
+   },
+   {
+    "desc": "some finds 4",
+    "op": "some",
+    "pending": false,
+    "ok": true,
+    "result": true
+   },
+   {
+    "desc": "some misses 99",
+    "op": "some",
+    "pending": false,
+    "ok": true,
+    "result": false
+   },
+   {
+    "desc": "some on sparse skips holes",
+    "op": "some",
+    "pending": false,
+    "ok": true,
+    "result": true
+   },
+   {
+    "desc": "every(null) throws TypeError",
+    "op": "every",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "indexOf hit",
+    "op": "indexOf",
+    "pending": false,
+    "ok": true,
+    "result": 2
+   },
+   {
+    "desc": "indexOf miss",
+    "op": "indexOf",
+    "pending": false,
+    "ok": true,
+    "result": -1
+   },
+   {
+    "desc": "indexOf from 3",
+    "op": "indexOf",
+    "pending": false,
+    "ok": true,
+    "result": 4
+   },
+   {
+    "desc": "indexOf from -2",
+    "op": "indexOf",
+    "pending": false,
+    "ok": true,
+    "result": 3
+   },
+   {
+    "desc": "indexOf from -Infinity",
+    "op": "indexOf",
+    "pending": false,
+    "ok": true,
+    "result": 0
+   },
+   {
+    "desc": "indexOf from +Infinity",
+    "op": "indexOf",
+    "pending": false,
+    "ok": true,
+    "result": -1
+   },
+   {
+    "desc": "indexOf from NaN",
+    "op": "indexOf",
+    "pending": false,
+    "ok": true,
+    "result": 1
+   },
+   {
+    "desc": "indexOf from undefined",
+    "op": "indexOf",
+    "pending": false,
+    "ok": true,
+    "result": 1
+   },
+   {
+    "desc": "indexOf fractional 2.9",
+    "op": "indexOf",
+    "pending": false,
+    "ok": true,
+    "result": 3
+   },
+   {
+    "desc": "indexOf fractional 3.7 truncates",
+    "op": "indexOf",
+    "pending": false,
+    "ok": true,
+    "result": 4
+   },
+   {
+    "desc": "indexOf negative fractional",
+    "op": "indexOf",
+    "pending": false,
+    "ok": true,
+    "result": -1
+   },
+   {
+    "desc": "indexOf string fromIndex",
+    "op": "indexOf",
+    "pending": false,
+    "ok": true,
+    "result": 1
+   },
+   {
+    "desc": "indexOf from len",
+    "op": "indexOf",
+    "pending": false,
+    "ok": true,
+    "result": -1
+   },
+   {
+    "desc": "indexOf from len+5",
+    "op": "indexOf",
+    "pending": false,
+    "ok": true,
+    "result": -1
+   },
+   {
+    "desc": "indexOf from -len-5",
+    "op": "indexOf",
+    "pending": false,
+    "ok": true,
+    "result": 0
+   },
+   {
+    "desc": "indexOf strict no coercion",
+    "op": "indexOf",
+    "pending": false,
+    "ok": true,
+    "result": -1
+   },
+   {
+    "desc": "indexOf finds undefined element",
+    "op": "indexOf",
+    "pending": false,
+    "ok": true,
+    "result": 0
+   },
+   {
+    "desc": "indexOf hole is not undefined",
+    "op": "indexOf",
+    "pending": false,
+    "ok": true,
+    "result": -1
+   },
+   {
+    "desc": "indexOf empty",
+    "op": "indexOf",
+    "pending": false,
+    "ok": true,
+    "result": -1
+   },
+   {
+    "desc": "indexOf null not present",
+    "op": "indexOf",
+    "pending": false,
+    "ok": true,
+    "result": -1
+   },
+   {
+    "desc": "indexOf(null) throws TypeError",
+    "op": "indexOf",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "indexOf mixed values",
+    "op": "indexOf",
+    "pending": false,
+    "ok": true,
+    "result": 2
+   },
+   {
+    "desc": "lastIndexOf hit",
+    "op": "lastIndexOf",
+    "pending": false,
+    "ok": true,
+    "result": 2
+   },
+   {
+    "desc": "lastIndexOf picks last duplicate",
+    "op": "lastIndexOf",
+    "pending": false,
+    "ok": true,
+    "result": 2
+   },
+   {
+    "desc": "lastIndexOf from -2",
+    "op": "lastIndexOf",
+    "pending": false,
+    "ok": true,
+    "result": 1
+   },
+   {
+    "desc": "lastIndexOf from 2",
+    "op": "lastIndexOf",
+    "pending": false,
+    "ok": true,
+    "result": -1
+   },
+   {
+    "desc": "lastIndexOf absent fromIndex",
+    "op": "lastIndexOf",
+    "pending": false,
+    "ok": true,
+    "result": 4
+   },
+   {
+    "desc": "lastIndexOf from len clamps",
+    "op": "lastIndexOf",
+    "pending": false,
+    "ok": true,
+    "result": 4
+   },
+   {
+    "desc": "lastIndexOf from +Infinity",
+    "op": "lastIndexOf",
+    "pending": false,
+    "ok": true,
+    "result": 4
+   },
+   {
+    "desc": "lastIndexOf from -Infinity",
+    "op": "lastIndexOf",
+    "pending": false,
+    "ok": true,
+    "result": -1
+   },
+   {
+    "desc": "lastIndexOf from NaN",
+    "op": "lastIndexOf",
+    "pending": false,
+    "ok": true,
+    "result": -1
+   },
+   {
+    "desc": "lastIndexOf from 0",
+    "op": "lastIndexOf",
+    "pending": false,
+    "ok": true,
+    "result": 0
+   },
+   {
+    "desc": "lastIndexOf from -1",
+    "op": "lastIndexOf",
+    "pending": false,
+    "ok": true,
+    "result": 4
+   },
+   {
+    "desc": "lastIndexOf from -len-1",
+    "op": "lastIndexOf",
+    "pending": false,
+    "ok": true,
+    "result": -1
+   },
+   {
+    "desc": "lastIndexOf fractional 3.9",
+    "op": "lastIndexOf",
+    "pending": false,
+    "ok": true,
+    "result": 1
+   },
+   {
+    "desc": "lastIndexOf finds undefined element",
+    "op": "lastIndexOf",
+    "pending": false,
+    "ok": true,
+    "result": 1
+   },
+   {
+    "desc": "lastIndexOf hole is not undefined",
+    "op": "lastIndexOf",
+    "pending": false,
+    "ok": true,
+    "result": -1
+   },
+   {
+    "desc": "lastIndexOf empty",
+    "op": "lastIndexOf",
+    "pending": false,
+    "ok": true,
+    "result": -1
+   },
+   {
+    "desc": "lastIndexOf mixed values",
+    "op": "lastIndexOf",
+    "pending": false,
+    "ok": true,
+    "result": 2
+   },
+   {
+    "desc": "reduce sum with init",
+    "op": "reduce",
+    "pending": false,
+    "ok": true,
+    "result": 15
+   },
+   {
+    "desc": "reduce sum no init",
+    "op": "reduce",
+    "pending": false,
+    "ok": true,
+    "result": 15
+   },
+   {
+    "desc": "reduce product",
+    "op": "reduce",
+    "pending": false,
+    "ok": true,
+    "result": 120
+   },
+   {
+    "desc": "reduce concat strings",
+    "op": "reduce",
+    "pending": false,
+    "ok": true,
+    "result": "+abc"
+   },
+   {
+    "desc": "reduce no init skips holes",
+    "op": "reduce",
+    "pending": false,
+    "ok": true,
+    "result": "xy"
+   },
+   {
+    "desc": "reduce with init on sparse",
+    "op": "reduce",
+    "pending": false,
+    "ok": true,
+    "result": "zxy"
+   },
+   {
+    "desc": "reduce single element no init",
+    "op": "reduce",
+    "pending": false,
+    "ok": true,
+    "result": 42
+   },
+   {
+    "desc": "reduce empty with init",
+    "op": "reduce",
+    "pending": false,
+    "ok": true,
+    "result": 7
+   },
+   {
+    "desc": "reduce empty no init throws",
+    "op": "reduce",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "reduce all-sparse no init throws",
+    "op": "reduce",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "reduce undefined-first element no init",
+    "op": "reduce",
+    "pending": false,
+    "ok": true,
+    "result": null
+   },
+   {
+    "desc": "reduce(null) throws TypeError",
+    "op": "reduce",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "reduce non-callable throws",
+    "op": "reduce",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "reduceRight order",
+    "op": "reduceRight",
+    "pending": false,
+    "ok": true,
+    "result": "cba"
+   },
+   {
+    "desc": "reduceRight sum",
+    "op": "reduceRight",
+    "pending": false,
+    "ok": true,
+    "result": 15
+   },
+   {
+    "desc": "reduceRight no init",
+    "op": "reduceRight",
+    "pending": false,
+    "ok": true,
+    "result": 15
+   },
+   {
+    "desc": "reduceRight sparse no init",
+    "op": "reduceRight",
+    "pending": false,
+    "ok": true,
+    "result": "yx"
+   },
+   {
+    "desc": "reduceRight empty throws",
+    "op": "reduceRight",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "reduceRight empty with init",
+    "op": "reduceRight",
+    "pending": false,
+    "ok": true,
+    "result": 7
+   },
+   {
+    "desc": "isArray true on array",
+    "op": "isArray",
+    "pending": false,
+    "ok": true,
+    "result": true
+   },
+   {
+    "desc": "isArray false on array-like",
+    "op": "isArray",
+    "pending": false,
+    "ok": true,
+    "result": false
+   },
+   {
+    "desc": "isArray false on string",
+    "op": "isArray",
+    "pending": false,
+    "ok": true,
+    "result": false
+   },
+   {
+    "desc": "isArray false on null",
+    "op": "isArray",
+    "pending": false,
+    "ok": true,
+    "result": false
+   },
+   {
+    "desc": "isArray false on number 7",
+    "op": "isArray",
+    "pending": false,
+    "ok": true,
+    "result": false
+   },
+   {
+    "desc": "isArray false on undefined",
+    "op": "isArray",
+    "pending": false,
+    "ok": true,
+    "result": false
+   },
+   {
+    "desc": "isArray false on arguments-like",
+    "op": "isArray",
+    "pending": false,
+    "ok": true,
+    "result": false
+   },
+   {
+    "desc": "every no thisArg",
+    "op": "every",
+    "pending": false,
+    "ok": true,
+    "result": true
+   },
+   {
+    "desc": "some with object elements",
+    "op": "some",
+    "pending": false,
+    "ok": true,
+    "result": true
+   },
+   {
+    "desc": "concat flattens one level",
+    "op": "concat",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7
+    ]
+   },
+   {
+    "desc": "concat scalars appended",
+    "op": "concat",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     2,
+     3,
+     4,
+     5
+    ]
+   },
+   {
+    "desc": "concat empty receiver",
+    "op": "concat",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1
+    ]
+   },
+   {
+    "desc": "concat on array-like appends object (spec: no spread of array-likes)",
+    "op": "concat",
+    "pending": false,
+    "ok": true,
+    "result": [
+     {
+      "0": 10,
+      "1": 20,
+      "2": 30,
+      "length": 3
+     }
+    ]
+   },
+   {
+    "desc": "concat does not deep flatten",
+    "op": "concat",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     [
+      2
+     ]
+    ]
+   },
+   {
+    "desc": "concat null and undefined elements",
+    "op": "concat",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     null,
+     null
+    ]
+   },
+   {
+    "desc": "concat no args returns copy",
+    "op": "concat",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     2,
+     3,
+     4,
+     5
+    ]
+   },
+   {
+    "desc": "concat(null) throws TypeError",
+    "op": "concat",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "join default separator",
+    "op": "join",
+    "pending": false,
+    "ok": true,
+    "result": "1,2,3,4,5"
+   },
+   {
+    "desc": "join hyphen",
+    "op": "join",
+    "pending": false,
+    "ok": true,
+    "result": "a-b-c"
+   },
+   {
+    "desc": "join empty separator",
+    "op": "join",
+    "pending": false,
+    "ok": true,
+    "result": "ab"
+   },
+   {
+    "desc": "join null and undefined become empty",
+    "op": "join",
+    "pending": false,
+    "ok": true,
+    "result": "1---3"
+   },
+   {
+    "desc": "join holes become empty",
+    "op": "join",
+    "pending": false,
+    "ok": true,
+    "result": ",x,,,y,"
+   },
+   {
+    "desc": "join nested arrays toString",
+    "op": "join",
+    "pending": false,
+    "ok": true,
+    "result": "1-2,3-4"
+   },
+   {
+    "desc": "join separator 0 is \"0\"",
+    "op": "join",
+    "pending": false,
+    "ok": true,
+    "result": "102"
+   },
+   {
+    "desc": "join empty array",
+    "op": "join",
+    "pending": false,
+    "ok": true,
+    "result": ""
+   },
+   {
+    "desc": "join multi-char separator",
+    "op": "join",
+    "pending": false,
+    "ok": true,
+    "result": "1::-2::3"
+   },
+   {
+    "desc": "join negative values (design Â§4.4)",
+    "op": "join",
+    "pending": false,
+    "ok": true,
+    "result": "-1,0,-2147483648"
+   },
+   {
+    "desc": "join(string) throws TypeError",
+    "op": "join",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "pop returns last",
+    "op": "pop",
+    "pending": false,
+    "ok": true,
+    "result": 5,
+    "state": [
+     1,
+     2,
+     3,
+     4
+    ]
+   },
+   {
+    "desc": "pop empty returns undefined",
+    "op": "pop",
+    "pending": false,
+    "ok": true,
+    "state": []
+   },
+   {
+    "desc": "push returns new length",
+    "op": "push",
+    "pending": false,
+    "ok": true,
+    "result": 4,
+    "state": [
+     1,
+     2,
+     3,
+     4
+    ]
+   },
+   {
+    "desc": "push single returns length",
+    "op": "push",
+    "pending": false,
+    "ok": true,
+    "result": 1,
+    "state": [
+     9
+    ]
+   },
+   {
+    "desc": "shift returns first",
+    "op": "shift",
+    "pending": false,
+    "ok": true,
+    "result": 1,
+    "state": [
+     2,
+     3,
+     4,
+     5
+    ]
+   },
+   {
+    "desc": "shift empty returns undefined",
+    "op": "shift",
+    "pending": false,
+    "ok": true,
+    "state": []
+   },
+   {
+    "desc": "unshift returns length",
+    "op": "unshift",
+    "pending": false,
+    "ok": true,
+    "result": 4,
+    "state": [
+     0,
+     1,
+     2,
+     3
+    ]
+   },
+   {
+    "desc": "unshift empty",
+    "op": "unshift",
+    "pending": false,
+    "ok": true,
+    "result": 1,
+    "state": [
+     7
+    ]
+   },
+   {
+    "desc": "reverse mutates and returns same",
+    "op": "reverse",
+    "pending": false,
+    "ok": true,
+    "result": [
+     5,
+     4,
+     3,
+     2,
+     1
+    ],
+    "state": [
+     5,
+     4,
+     3,
+     2,
+     1
+    ]
+   },
+   {
+    "desc": "reverse empty",
+    "op": "reverse",
+    "pending": false,
+    "ok": true,
+    "result": [],
+    "state": []
+   },
+   {
+    "desc": "pop(null) throws TypeError",
+    "op": "pop",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "push(null) throws TypeError",
+    "op": "push",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "slice copies",
+    "op": "slice",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     2,
+     3,
+     4,
+     5
+    ]
+   },
+   {
+    "desc": "slice start/end",
+    "op": "slice",
+    "pending": false,
+    "ok": true,
+    "result": [
+     2,
+     3
+    ]
+   },
+   {
+    "desc": "slice negative start",
+    "op": "slice",
+    "pending": false,
+    "ok": true,
+    "result": [
+     4,
+     5
+    ]
+   },
+   {
+    "desc": "slice beyond end is empty",
+    "op": "slice",
+    "pending": false,
+    "ok": true,
+    "result": []
+   },
+   {
+    "desc": "slice before start is full copy",
+    "op": "slice",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     2,
+     3,
+     4,
+     5
+    ]
+   },
+   {
+    "desc": "slice end negative",
+    "op": "slice",
+    "pending": false,
+    "ok": true,
+    "result": [
+     2,
+     3,
+     4
+    ]
+   },
+   {
+    "desc": "slice on string array-like",
+    "op": "slice",
+    "pending": false,
+    "ok": true,
+    "result": [
+     "a",
+     "b",
+     "c"
+    ]
+   },
+   {
+    "desc": "slice preserves holes",
+    "op": "slice",
+    "pending": false,
+    "ok": true,
+    "result": [
+     "x",
+     null,
+     null,
+     "y"
+    ]
+   },
+   {
+    "desc": "slice(null) throws TypeError",
+    "op": "slice",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "sort default ToString order",
+    "op": "sort",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     10,
+     2,
+     9
+    ],
+    "state": [
+     1,
+     10,
+     2,
+     9
+    ]
+   },
+   {
+    "desc": "sort powers of 10 mixed with small ints (ToString)",
+    "op": "sort",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     10,
+     100,
+     1000,
+     2,
+     20
+    ],
+    "state": [
+     1,
+     10,
+     100,
+     1000,
+     2,
+     20
+    ]
+   },
+   {
+    "desc": "sort negative ints mixed with positives (ToString: -2 < -5 < 0 < 10 < 3)",
+    "op": "sort",
+    "pending": false,
+    "ok": true,
+    "result": [
+     -2,
+     -5,
+     0,
+     10,
+     3
+    ],
+    "state": [
+     -2,
+     -5,
+     0,
+     10,
+     3
+    ]
+   },
+   {
+    "desc": "sort duplicates",
+    "op": "sort",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     1,
+     2,
+     2
+    ],
+    "state": [
+     1,
+     1,
+     2,
+     2
+    ]
+   },
+   {
+    "desc": "sort max/min int32",
+    "op": "sort",
+    "pending": false,
+    "ok": true,
+    "result": [
+     -2147483648,
+     0,
+     2147483647
+    ],
+    "state": [
+     -2147483648,
+     0,
+     2147483647
+    ]
+   },
+   {
+    "desc": "sort mixed digit lengths",
+    "op": "sort",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     9,
+     99,
+     999,
+     9999
+    ],
+    "state": [
+     1,
+     9,
+     99,
+     999,
+     9999
+    ]
+   },
+   {
+    "desc": "sort numeric compareFn",
+    "op": "sort",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     2,
+     9,
+     10
+    ],
+    "state": [
+     1,
+     2,
+     9,
+     10
+    ]
+   },
+   {
+    "desc": "sort mixed types ToString",
+    "op": "sort",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     5,
+     null,
+     "two",
+     null
+    ],
+    "state": [
+     1,
+     5,
+     null,
+     "two",
+     null
+    ]
+   },
+   {
+    "desc": "sort NaN/Infinity/-0 ToString",
+    "op": "sort",
+    "pending": false,
+    "ok": true,
+    "result": [
+     null,
+     0,
+     0,
+     1,
+     null,
+     null
+    ],
+    "state": [
+     null,
+     0,
+     0,
+     1,
+     null,
+     null
+    ]
+   },
+   {
+    "desc": "sort sparse: values compact front, holes stay holes at end (V8 verified)",
+    "op": "sort",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     3,
+     null,
+     null
+    ],
+    "state": [
+     1,
+     3,
+     null,
+     null
+    ]
+   },
+   {
+    "desc": "sort comparator mixed numbers and strings",
+    "op": "sort",
+    "pending": false,
+    "ok": true,
+    "result": [
+     0,
+     "2",
+     1,
+     3
+    ],
+    "state": [
+     0,
+     "2",
+     1,
+     3
+    ]
+   },
+   {
+    "desc": "sort comparator stability",
+    "op": "sort",
+    "pending": false,
+    "ok": true,
+    "result": [
+     {
+      "k": 0,
+      "id": 2
+     },
+     {
+      "k": 1,
+      "id": 0
+     },
+     {
+      "k": 1,
+      "id": 1
+     }
+    ],
+    "state": [
+     {
+      "k": 0,
+      "id": 2
+     },
+     {
+      "k": 1,
+      "id": 0
+     },
+     {
+      "k": 1,
+      "id": 1
+     }
+    ]
+   },
+   {
+    "desc": "sort comparator NaN pins deterministic order (carve-out D7)",
+    "op": "sort",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     3,
+     null
+    ],
+    "state": [
+     1,
+     3,
+     null
+    ]
+   },
+   {
+    "desc": "sort array-like object",
+    "op": "sort",
+    "pending": false,
+    "ok": true,
+    "result": {
+     "0": 1,
+     "1": 2,
+     "2": 3,
+     "length": 3
+    },
+    "state": {
+     "0": 1,
+     "1": 2,
+     "2": 3,
+     "length": 3
+    }
+   },
+   {
+    "desc": "sort(null) throws TypeError",
+    "op": "sort",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "sort non-callable compareFn throws",
+    "op": "sort",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "splice removes range",
+    "op": "splice",
+    "pending": false,
+    "ok": true,
+    "result": [
+     2,
+     3
+    ],
+    "state": [
+     1,
+     4
+    ]
+   },
+   {
+    "desc": "splice inserts",
+    "op": "splice",
+    "pending": false,
+    "ok": true,
+    "result": [],
+    "state": [
+     1,
+     "a",
+     "b",
+     2,
+     3
+    ]
+   },
+   {
+    "desc": "splice negative start",
+    "op": "splice",
+    "pending": false,
+    "ok": true,
+    "result": [
+     3
+    ],
+    "state": [
+     1,
+     2
+    ]
+   },
+   {
+    "desc": "splice absent deleteCount deletes to end",
+    "op": "splice",
+    "pending": false,
+    "ok": true,
+    "result": [
+     2,
+     3
+    ],
+    "state": [
+     1
+    ]
+   },
+   {
+    "desc": "splice replace",
+    "op": "splice",
+    "pending": false,
+    "ok": true,
+    "result": [
+     2
+    ],
+    "state": [
+     1,
+     9,
+     3
+    ]
+   },
+   {
+    "desc": "splice empty",
+    "op": "splice",
+    "pending": false,
+    "ok": true,
+    "result": [],
+    "state": [
+     "x"
+    ]
+   },
+   {
+    "desc": "splice(null) throws TypeError",
+    "op": "splice",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "toString joins with comma",
+    "op": "toString",
+    "pending": false,
+    "ok": true,
+    "result": "1,2,3,4,5"
+   },
+   {
+    "desc": "toString nested arrays",
+    "op": "toString",
+    "pending": false,
+    "ok": true,
+    "result": "1,2,3"
+   },
+   {
+    "desc": "toString undefined becomes empty",
+    "op": "toString",
+    "pending": false,
+    "ok": true,
+    "result": "1,,2"
+   },
+   {
+    "desc": "toString on plain object falls back to Object tag",
+    "op": "toString",
+    "pending": false,
+    "ok": true,
+    "result": "[object Object]"
+   },
+   {
+    "desc": "toString(null) throws TypeError",
+    "op": "toString",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "find first even",
+    "op": "find",
+    "pending": false,
+    "ok": true,
+    "result": 2
+   },
+   {
+    "desc": "find missing returns undefined",
+    "op": "find",
+    "pending": false,
+    "ok": true
+   },
+   {
+    "desc": "find on sparse skips holes",
+    "op": "find",
+    "pending": false,
+    "ok": true,
+    "result": "x"
+   },
+   {
+    "desc": "find on array-like",
+    "op": "find",
+    "pending": false,
+    "ok": true,
+    "result": 20
+   },
+   {
+    "desc": "find(null) throws TypeError",
+    "op": "find",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "find non-callable throws",
+    "op": "find",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "findIndex first even",
+    "op": "findIndex",
+    "pending": false,
+    "ok": true,
+    "result": 1
+   },
+   {
+    "desc": "findIndex missing returns -1",
+    "op": "findIndex",
+    "pending": false,
+    "ok": true,
+    "result": -1
+   },
+   {
+    "desc": "findIndex on sparse skips holes",
+    "op": "findIndex",
+    "pending": false,
+    "ok": true,
+    "result": 1
+   },
+   {
+    "desc": "findIndex(null) throws TypeError",
+    "op": "findIndex",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "findIndex non-callable throws",
+    "op": "findIndex",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "fill all",
+    "op": "fill",
+    "pending": false,
+    "ok": true,
+    "result": [
+     0,
+     0,
+     0
+    ],
+    "state": [
+     0,
+     0,
+     0
+    ]
+   },
+   {
+    "desc": "fill from start",
+    "op": "fill",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     0,
+     0
+    ],
+    "state": [
+     1,
+     0,
+     0
+    ]
+   },
+   {
+    "desc": "fill range",
+    "op": "fill",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     0,
+     3
+    ],
+    "state": [
+     1,
+     0,
+     3
+    ]
+   },
+   {
+    "desc": "fill negative start",
+    "op": "fill",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     0,
+     0
+    ],
+    "state": [
+     1,
+     0,
+     0
+    ]
+   },
+   {
+    "desc": "fill end before start noop",
+    "op": "fill",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     2,
+     3
+    ],
+    "state": [
+     1,
+     2,
+     3
+    ]
+   },
+   {
+    "desc": "fill NaN start is 0",
+    "op": "fill",
+    "pending": false,
+    "ok": true,
+    "result": [
+     9,
+     9,
+     9
+    ],
+    "state": [
+     9,
+     9,
+     9
+    ]
+   },
+   {
+    "desc": "fill fills holes",
+    "op": "fill",
+    "pending": false,
+    "ok": true,
+    "result": [
+     7,
+     7,
+     7
+    ],
+    "state": [
+     7,
+     7,
+     7
+    ]
+   },
+   {
+    "desc": "fill explicit undefined end is treated as len",
+    "op": "fill",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     0,
+     0
+    ],
+    "state": [
+     1,
+     0,
+     0
+    ]
+   },
+   {
+    "desc": "fill(null) throws TypeError",
+    "op": "fill",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "copyWithin basic",
+    "op": "copyWithin",
+    "pending": false,
+    "ok": true,
+    "result": [
+     4,
+     5,
+     3,
+     4,
+     5
+    ],
+    "state": [
+     4,
+     5,
+     3,
+     4,
+     5
+    ]
+   },
+   {
+    "desc": "copyWithin range",
+    "op": "copyWithin",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     4,
+     5,
+     4,
+     5
+    ],
+    "state": [
+     1,
+     4,
+     5,
+     4,
+     5
+    ]
+   },
+   {
+    "desc": "copyWithin negative target/start/end",
+    "op": "copyWithin",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     2,
+     3,
+     3,
+     4
+    ],
+    "state": [
+     1,
+     2,
+     3,
+     3,
+     4
+    ]
+   },
+   {
+    "desc": "copyWithin negative start only",
+    "op": "copyWithin",
+    "pending": false,
+    "ok": true,
+    "result": [
+     4,
+     5,
+     3,
+     4,
+     5
+    ],
+    "state": [
+     4,
+     5,
+     3,
+     4,
+     5
+    ]
+   },
+   {
+    "desc": "copyWithin end before start noop",
+    "op": "copyWithin",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     2,
+     3
+    ],
+    "state": [
+     1,
+     2,
+     3
+    ]
+   },
+   {
+    "desc": "copyWithin target beyond length noop",
+    "op": "copyWithin",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     2,
+     3
+    ],
+    "state": [
+     1,
+     2,
+     3
+    ]
+   },
+   {
+    "desc": "copyWithin(null) throws TypeError",
+    "op": "copyWithin",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "includes hit",
+    "op": "includes",
+    "pending": false,
+    "ok": true,
+    "result": true
+   },
+   {
+    "desc": "includes miss",
+    "op": "includes",
+    "pending": false,
+    "ok": true,
+    "result": false
+   },
+   {
+    "desc": "includes NaN matches NaN",
+    "op": "includes",
+    "pending": false,
+    "ok": true,
+    "result": true
+   },
+   {
+    "desc": "includes -0 matches 0",
+    "op": "includes",
+    "pending": false,
+    "ok": true,
+    "result": true
+   },
+   {
+    "desc": "includes no coercion",
+    "op": "includes",
+    "pending": false,
+    "ok": true,
+    "result": false
+   },
+   {
+    "desc": "includes fromIndex",
+    "op": "includes",
+    "pending": false,
+    "ok": true,
+    "result": false
+   },
+   {
+    "desc": "includes negative fromIndex",
+    "op": "includes",
+    "pending": false,
+    "ok": true,
+    "result": true
+   },
+   {
+    "desc": "includes beyond length",
+    "op": "includes",
+    "pending": false,
+    "ok": true,
+    "result": false
+   },
+   {
+    "desc": "includes finds undefined element",
+    "op": "includes",
+    "pending": false,
+    "ok": true,
+    "result": true
+   },
+   {
+    "desc": "includes matches holes as undefined (V8 behavior)",
+    "op": "includes",
+    "pending": false,
+    "ok": true,
+    "result": true
+   },
+   {
+    "desc": "includes on string array-like",
+    "op": "includes",
+    "pending": false,
+    "ok": true,
+    "result": true
+   },
+   {
+    "desc": "includes(null) throws TypeError",
+    "op": "includes",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "flat default depth 1",
+    "op": "flat",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     2,
+     [
+      3
+     ]
+    ]
+   },
+   {
+    "desc": "flat depth 2",
+    "op": "flat",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     2,
+     3,
+     [
+      4
+     ]
+    ]
+   },
+   {
+    "desc": "flat Infinity",
+    "op": "flat",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     2,
+     3,
+     4
+    ]
+   },
+   {
+    "desc": "flat removes holes",
+    "op": "flat",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     3
+    ]
+   },
+   {
+    "desc": "flat depth 0 no flatten",
+    "op": "flat",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     [
+      2
+     ]
+    ]
+   },
+   {
+    "desc": "flat negative depth no flatten",
+    "op": "flat",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     [
+      2
+     ]
+    ]
+   },
+   {
+    "desc": "flat explicit undefined depth is treated as 1",
+    "op": "flat",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     2
+    ]
+   },
+   {
+    "desc": "flat(null) throws TypeError",
+    "op": "flat",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "flatMap expands",
+    "op": "flatMap",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     10,
+     2,
+     20,
+     3,
+     30,
+     4,
+     40,
+     5,
+     50
+    ]
+   },
+   {
+    "desc": "flatMap scalar pairs",
+    "op": "flatMap",
+    "pending": false,
+    "ok": true,
+    "result": [
+     "1",
+     0,
+     "2",
+     1
+    ]
+   },
+   {
+    "desc": "flatMap empty",
+    "op": "flatMap",
+    "pending": false,
+    "ok": true,
+    "result": []
+   },
+   {
+    "desc": "flatMap(null) throws TypeError",
+    "op": "flatMap",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "flatMap non-callable throws",
+    "op": "flatMap",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "from string",
+    "op": "from",
+    "pending": false,
+    "ok": true,
+    "result": [
+     "a",
+     "b",
+     "c"
+    ]
+   },
+   {
+    "desc": "from array-like with mapFn",
+    "op": "from",
+    "pending": false,
+    "ok": true,
+    "result": [
+     "1#0",
+     "2#1",
+     "3#2"
+    ]
+   },
+   {
+    "desc": "from preserves holes as undefined elements (Node behavior)",
+    "op": "from",
+    "pending": false,
+    "ok": true,
+    "result": [
+     "1#0",
+     "undefined#1",
+     "3#2"
+    ]
+   },
+   {
+    "desc": "from without mapFn copies holes as undefined elements",
+    "op": "from",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     null,
+     3
+    ]
+   },
+   {
+    "desc": "from empty",
+    "op": "from",
+    "pending": false,
+    "ok": true,
+    "result": []
+   },
+   {
+    "desc": "from(null) throws TypeError",
+    "op": "from",
+    "pending": false,
+    "ok": true,
+    "result": "TypeError"
+   },
+   {
+    "desc": "of empty",
+    "op": "of",
+    "pending": false,
+    "ok": true,
+    "result": []
+   },
+   {
+    "desc": "of values",
+    "op": "of",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     "a",
+     null
+    ]
+   },
+   {
+    "desc": "of single undefined is an element",
+    "op": "of",
+    "pending": false,
+    "ok": true,
+    "result": [
+     null
+    ]
+   },
+   {
+    "desc": "of sparse-ish spread of values",
+    "op": "of",
+    "pending": false,
+    "ok": true,
+    "result": [
+     1,
+     [
+      2
+     ],
+     3
+    ]
+   },
+   {
+    "desc": "entries sequence",
+    "op": "entries",
+    "pending": false,
+    "ok": true,
+    "result": [
+     [
+      0,
+      "a"
+     ],
+     [
+      1,
+      "b"
+     ],
+     [
+      2,
+      "c"
+     ]
+    ]
+   },
+   {
+    "desc": "entries yields undefined for holes",
+    "op": "entries",
+    "pending": false,
+    "ok": true,
+    "result": [
+     [
+      0,
+      null
+     ],
+     [
+      1,
+      null
+     ]
+    ]
+   },
+   {
+    "desc": "entries on array-like",
+    "op": "entries",
+    "pending": false,
+    "ok": true,
+    "result": [
+     [
+      0,
+      10
+     ],
+     [
+      1,
+      20
+     ],
+     [
+      2,
+      30
+     ]
+    ]
+   },
+   {
+    "desc": "entries on string",
+    "op": "entries",
+    "pending": false,
+    "ok": true,
+    "result": [
+     [
+      0,
+      "a"
+     ],
+     [
+      1,
+      "b"
+     ],
+     [
+      2,
+      "c"
+     ]
+    ]
+   },
+   {
+    "desc": "keys sequence",
+    "op": "keys",
+    "pending": false,
+    "ok": true,
+    "result": [
+     0,
+     1,
+     2
+    ]
+   },
+   {
+    "desc": "keys yields all indices for holes",
+    "op": "keys",
+    "pending": false,
+    "ok": true,
+    "result": [
+     0,
+     1
+    ]
+   },
+   {
+    "desc": "values sequence",
+    "op": "values",
+    "pending": false,
+    "ok": true,
+    "result": [
+     "a",
+     "b",
+     "c"
+    ]
+   },
+   {
+    "desc": "values yields undefined for holes",
+    "op": "values",
+    "pending": false,
+    "ok": true,
+    "result": [
+     null,
+     null
+    ]
+   },
+   {
+    "desc": "indexOf -0 matches 0 by strict equality",
+    "op": "indexOf",
+    "pending": false,
+    "ok": true,
+    "result": 0
+   },
+   {
+    "desc": "indexOf NaN never found (strict)",
+    "op": "indexOf",
+    "pending": false,
+    "ok": true,
+    "result": -1
+   },
+   {
+    "desc": "lastIndexOf from -0.5 returns -0 (ES5.1-exact, carve-out D3)",
+    "op": "lastIndexOf",
+    "pending": false,
+    "ok": true,
+    "result": 0
+   },
+   {
+    "desc": "lastIndexOf from -0 returns +0 (matches Node; || 0 fast path)",
+    "op": "lastIndexOf",
+    "pending": false,
+    "ok": true,
+    "result": 0
+   },
+   {
+    "desc": "lastIndexOf from 0.5 truncates to 0 and scans down",
+    "op": "lastIndexOf",
+    "pending": false,
+    "ok": true,
+    "result": -1
+   }
+  ],
+  "gateCaps": {
+   "present": true,
+   "enabled": true,
+   "reason": "",
+   "dll": "ESARRArray",
+   "dllVersion": "ESARRArray 1.0.0 (ESARR native lanes; byte+1 wire)",
+   "lanes": [
+    "sort",
+    "toSorted",
+    "reverse",
+    "toReversed",
+    "join",
+    "indexOf",
+    "lastIndexOf",
+    "includes"
+   ],
+   "certified": 38
+  },
+  "extras": {
+   "reduceAbsent": 6,
+   "reduceInit": 16,
+   "lastIdxAbsent": 1,
+   "lastIdxUndef": -1,
+   "indexOf": 1,
+   "forEachThis": "1,2,",
+   "findThis": "1,2,",
+   "flatMapThis": "1,2,",
+   "fromThis": "1,2,",
+   "sortDecimal": "1,10,2,9",
+   "isArrayArr": true,
+   "isArrayArgs": false,
+   "sparseMap": "[2,null,6]",
+   "sparseLiteralIn": true,
+   "sparseForEach": 3,
+   "emptyReduce": "TypeError",
+   "capsAfter": {
+    "engine": "4.5.6",
+    "nativeList": [
+     "slice",
+     "concat",
+     "join",
+     "push",
+     "pop",
+     "shift",
+     "unshift",
+     "splice",
+     "sort",
+     "reverse",
+     "toString",
+     "forEach",
+     "map",
+     "filter",
+     "every",
+     "some",
+     "indexOf",
+     "lastIndexOf",
+     "reduce",
+     "reduceRight",
+     "find",
+     "findIndex",
+     "includes",
+     "at",
+     "copyWithin",
+     "fill",
+     "flat",
+     "flatMap",
+     "keys",
+     "values",
+     "entries",
+     "toSorted",
+     "toReversed",
+     "with",
+     "findLast",
+     "findLastIndex",
+     "isArray",
+     "from",
+     "of"
+    ],
+    "missing": [],
+    "native": {
+     "present": true,
+     "enabled": false,
+     "reason": "",
+     "dll": "",
+     "dllVersion": "",
+     "lanes": [],
+     "certified": 0
+    }
+   },
+   "installAgain": "ok",
+   "forceReplace": "ok"
+  },
+  "cls": {
+   "array": "Array",
+   "args": "Object",
+   "stringObj": "String",
+   "collection": "ERR Error: No such element",
+   "documentsLen": 0,
+   "isArrayCollection": false
+  }
+ }
+}

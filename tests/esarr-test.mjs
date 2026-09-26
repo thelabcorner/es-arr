@@ -44,7 +44,7 @@ try {
   try { rmSync(BUNDLE); } catch (ignore) {}
 }
 
-// Chained Node-side checks (same family convention as eson/esb64): the lane
-// wire round-trip + the vendor-sync guard. Both must pass for `npm test`.
+// Chained Node-side producer check: the lane wire round-trip belongs to the
+// repository's own semantic gate. COM-skill vendor synchronization is an
+// external integration edge and is verified separately by release:integration.
 execFileSync(process.execPath, [join(ROOT, 'wire-test.mjs')], { stdio: 'inherit' });
-execFileSync(process.execPath, [join(ROOT, 'vendor-sync-test.mjs')], { stdio: 'inherit' });

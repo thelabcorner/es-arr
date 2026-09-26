@@ -17,6 +17,8 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, writeFileSync, rmSync, statSync, readFileSync, readdirSync } from 'node:fs';
 import { join, dirname, basename } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { createLegacyComToolV2Runner } from '../../extendscript-toolchain/src/comtool-v2-compat.mjs';
+import { buildLiveProbe } from './build-live-probe.mjs';
 
 var ROOT = dirname(fileURLToPath(import.meta.url));
 var PROJECT = join(ROOT, '..');
@@ -28,10 +30,11 @@ var NATIVE = join(PROJECT, 'native', 'bin');
 var DLL = join(NATIVE, 'ESARRArray.dll');
 var BUNDLE = join(DIST, 'ESARR.accel.jsx');
 var SCRIPTS = process.env.ESARR_DEV_SCRIPTS || 'C:/Program Files/Adobe/Adobe Illustrator 2026/Presets/en_US/Scripts';
-var TOOL = process.env.ILLUSTRATOR_COM_TOOL || SCRIPTS + '/agent-skills/illustrator-com-automation-skill/comtool/ILLUSTRATOR_COM_TOOL.py';
 var ESPACK_BUILD = process.env.ESPACK_BUILD || SCRIPTS + '/espack/espack-build.mjs';
 var CACHE = join(process.env.LOCALAPPDATA || '', 'esarr');
 var SHARED_ACCEL_DIR = join(process.env.LOCALAPPDATA || '', 'espack');
+var COM = createLegacyComToolV2Runner();
+process.on('exit', function () { try { COM.close(); } catch (ignore) {} });
 
 var failures = 0;
 function check(name, cond, detail) {
@@ -48,18 +51,13 @@ if (!existsSync(DLL)) {
   console.log('PENDING: native/bin/ESARRArray.dll not built yet (T3 pipeline) — skipping accel e2e');
   process.exit(0);
 }
-if (!existsSync(TOOL)) {
-  console.error('FAIL: COM tool not found at ' + TOOL);
-  process.exit(1);
-}
 
 var dllBytes = readFileSync(DLL);
 console.log('E2E: DLL ' + basename(DLL) + ' ' + dllBytes.length + ' bytes; cache ' + CACHE);
 
 // ---- helpers ----------------------------------------------------------------
 function runTool(args, timeoutMs) {
-  var out = execFileSync('python', [TOOL].concat(args), { encoding: 'utf8', timeout: timeoutMs || 240000 });
-  return JSON.parse(out.trim());
+  return COM.run(args, { timeoutMs: timeoutMs || 240000 });
 }
 function evalSmoke(bundlePath, smokeSrc) {
   var env = runTool(['eval', '--code',
@@ -72,6 +70,9 @@ function evalSmoke(bundlePath, smokeSrc) {
   return env.result;
 }
 function killAllAutomation() {
+  // Release the V2 target lease and stop only our isolated RuntimeHost before
+  // replacing the Illustrator process generation.
+  COM.reset();
   execFileSync('powershell.exe', ['-NoProfile', '-Command',
     '$p = Get-Process -Name Illustrator -ErrorAction SilentlyContinue; if ($p) { $p | Stop-Process -Force }; exit 0'],
     { timeout: 30000 });
@@ -127,9 +128,7 @@ for (var vi = 0; vi < vectors.length; vi++) {
 var probeDir = join(process.env.TEMP || '', 'esarr-e2e');
 mkdirSync(probeDir, { recursive: true });
 var probeCorePath = join(probeDir, 'esarr-e2e-probe-core.jsx');
-execFileSync(process.execPath, [esbuildBin(), join(ROOT, 'probe-glue.ts'),
-  '--bundle', '--outfile=' + probeCorePath, '--format=iife', '--global-name=PROBECORE',
-  '--platform=neutral', '--target=es5', '--log-level=warning'], { stdio: 'inherit' });
+await buildLiveProbe(probeCorePath);
 
 var vectorsJson = JSON.stringify(encode(vectors));
 var coreForProbe = probeCorePath.replace(/\\/g, '/');
@@ -251,10 +250,12 @@ try {
   // and the gate never engages. Append the production bundle's facade+adapter
   // suffix (same composition as the fail-path bundle below). The facade starts
   // at the ESTC-built `var ESARR=` IIFE, which appears exactly once (the espack
-  // section never declares ESARR; the legacy bind-shim marker is gone with the
-  // ESTC migration).
+  // section never declares ESARR. The side-effect-only ESTC entry is rooted at
+  // `var __ESARR_ENTRY__=`; starting there preserves the facade publication and
+  // the following ESPACK adapter without depending on the removed `var ESARR=`
+  // namespace-wrapper topology.
   var prodBundleText = readFileSync(BUNDLE, 'utf8');
-  var facadeStart = prodBundleText.lastIndexOf('var ESARR=');
+  var facadeStart = prodBundleText.lastIndexOf('var __ESARR_ENTRY__=');
   if (facadeStart < 0) { throw new Error('production bundle facade marker not found'); }
   writeFileSync(v2bundle, readFileSync(v2bundle, 'utf8') + '\n' + prodBundleText.substring(facadeStart));
   var s2 = evalSmoke(v2bundle, SMOKE);
@@ -275,11 +276,11 @@ try {
   // espack adapter) — an espack-ONLY bundle defines ESPAK but never ESARR, so
   // evalSmoke's ESARR.install() would throw on a fresh instance. Reuse the
   // production bundle's facade+adapter suffix (everything from the ESTC-built
-  // `var ESARR=` IIFE onward) appended to the espack build output.
+  // side-effect entry onward) appended to the espack build output.
   var fb = espackBuild.build ? espackBuild.build({ embed: DLL, out: failBundle, name: 'esarr-e2e-fail', dllVersion: '1', cacheDir: BLOCKER.replace(/\\/g, '/') }) : null;
   if (fb) {
     var prodBundle = readFileSync(BUNDLE, 'utf8');
-    var facadeStart2 = prodBundle.lastIndexOf('var ESARR=');
+    var facadeStart2 = prodBundle.lastIndexOf('var __ESARR_ENTRY__=');
     if (facadeStart2 < 0) { throw new Error('production bundle facade marker not found'); }
     var facadeSuffix = prodBundle.substring(facadeStart2);
     writeFileSync(fb.outPath, readFileSync(fb.outPath, 'utf8') + '\n' + facadeSuffix);
@@ -296,8 +297,8 @@ try {
     var sf = evalSmoke(fb.outPath || failBundle, SMOKE);
     check('fail-path: stays es3 (graceful)', !(sf.gate && sf.gate.enabled), JSON.stringify(sf.gate));
     check('fail-path: no throw, clear error', sf.ok === true, sf.error);
-    killAllAutomation();
-    launchFresh();
+    // Cleanup below closes this fresh fail-path instance; do not relaunch an
+    // otherwise-unused Illustrator process only to kill it immediately again.
   }
 } catch (e) {
   console.log('      fail-path bundle build skipped (' + String(e.message || e).slice(0, 120) + ')');

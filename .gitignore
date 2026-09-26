@@ -12,3 +12,4 @@ tests/.esarr-test.bundle.mjs
 tests/.esarr-fuzz.bundle.mjs
 tests/.esarr-callbacks.bundle.mjs
 tests/.esarr-vectors.bundle.mjs
+docs/verification-checkpoints/live-*.json

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // ESARR live verification — FULL SURFACE: runs the shared vector battery
-// inside the REAL Adobe engine through ILLUSTRATOR_COM_TOOL.py and compares
+// inside the REAL Adobe engine through COM Tool V2 and compares
 // each engine result (return value AND post-mutation state for mutating ops)
 // against the Node-side core (which npm test has already validated against
 // Node's native Array methods). This is the engine-parity check: the same
@@ -16,19 +16,18 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, writeFileSync, readFileSync, readdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { createLegacyComToolV2Runner } from '../../extendscript-toolchain/src/comtool-v2-compat.mjs';
+import { buildLiveProbe } from './build-live-probe.mjs';
 
 var ROOT = dirname(fileURLToPath(import.meta.url));
 var PROJECT = join(ROOT, '..');
 var DIST = join(PROJECT, 'dist');
 var VENDOR = join(DIST, 'vendor-esarr.js');
-var TOOL = 'C:/Program Files/Adobe/Adobe Illustrator 2026/Presets/en_US/Scripts/agent-skills/illustrator-com-automation-skill/comtool/ILLUSTRATOR_COM_TOOL.py';
+var COM = createLegacyComToolV2Runner();
+process.on('exit', function () { try { COM.close(); } catch (ignore) {} });
 
 if (!existsSync(VENDOR)) {
   console.error('live-verify: build first (npm run build) - ' + VENDOR + ' missing');
-  process.exit(1);
-}
-if (!existsSync(TOOL)) {
-  console.error('live-verify: COM tool not found at ' + TOOL);
   process.exit(1);
 }
 
@@ -93,11 +92,10 @@ mkdirSync(probeDir, { recursive: true });
 var probePath = join(probeDir, 'esarr-live-battery.jsx');
 var probeCorePath = join(probeDir, 'esarr-probe-core.jsx');
 
-// Bundle the glue (callbacks.ts + probe-glue.ts) into a single IIFE.
-execFileSync(process.execPath, [esbuildBin(), join(ROOT, 'probe-glue.ts'),
-  '--bundle', '--outfile=' + probeCorePath,
-  '--format=iife', '--global-name=PROBECORE', '--platform=neutral', '--target=es5',
-  '--log-level=warning'], { stdio: 'inherit' });
+// Build the glue through ESTC itself. probe-glue.ts publishes
+// $.global.PROBECORE and exports nothing, while ESTC owns strict stripping,
+// reserved-property rewriting, helper rejection, and the final ES3 gate.
+await buildLiveProbe(probeCorePath);
 
 var vendorForProbe = VENDOR.replace(/\\/g, '/');
 var coreForProbe = probeCorePath.replace(/\\/g, '/');
@@ -172,7 +170,7 @@ var probeSrc = [
   '  try { w.sortDecimal = [10,9,1,2].sort().join(","); } catch (e) { w.sortDecimal = "ERR " + e; }',
   '  try { w.isArrayArr = Array.isArray([]); } catch (e) { w.isArrayArr = "ERR " + e; }',
   '  try { w.isArrayArgs = Array.isArray(arguments); } catch (e) { w.isArrayArgs = "ERR " + e; }',
-  '  try { w.sparseMap = JSON.stringify([1,,3].map(function (x) { return x * 2; })); } catch (e) { w.sparseMap = "ERR " + e; }',
+  '  try { w.sparseMap = (function () { var a = [1,,3].map(function (x) { return x * 2; }); var m = (1 in a) ? (a[1] === a[1] ? String(a[1]) : "null") : "null"; return "[" + String(a[0]) + "," + m + "," + String(a[2]) + "]"; })(); } catch (e) { w.sparseMap = "ERR " + e; }',
   '  try { w.sparseLiteralIn = 1 in [1,,3]; } catch (e) { w.sparseLiteralIn = "ERR " + e; }',
   '  try { w.sparseForEach = (function () { var n = 0; [1,,3].forEach(function () { n++; }); return n; })(); } catch (e) { w.sparseForEach = "ERR " + e; }',
   '  try { w.emptyReduce = (function () { try { return [].reduce(function (a, b) { return a + b; }); } catch (e) { return "TypeError"; } })(); } catch (e) { w.emptyReduce = "ERR " + e; }',
@@ -200,9 +198,7 @@ writeFileSync(probePath, probeSrc);
 // cross-agent lock serializes; the caller should announce on instances/active.
 console.log('live-verify: ensuring an Illustrator automation instance...');
 try {
-  var launchOut = execFileSync('python', [TOOL, 'status', '--launch'], {
-    encoding: 'utf8', timeout: 180000
-  });
+  var launchOut = COM.runText(['status', '--launch'], { timeoutMs: 180000 });
   var launchEnv = JSON.parse(launchOut.trim());
   if (!launchEnv.ok) {
     console.error('live-verify: instance launch failed: ' + JSON.stringify(launchEnv).slice(0, 800));
@@ -216,9 +212,10 @@ try {
 console.log('live-verify: running ' + vectors.length + ' vectors in Illustrator (JSX pass + native pass if a DLL certifies)...');
 var pyOut;
 try {
-  pyOut = execFileSync('python', [TOOL, 'eval', '--file', probePath.replace(/\\/g, '/')], {
-    encoding: 'utf8', timeout: 600000
-  });
+  pyOut = COM.runText(
+    ['eval', '--file', probePath.replace(/\\/g, '/')],
+    { timeoutMs: 600000 }
+  );
 } catch (e) {
   console.error('live-verify: COM tool failed: ' + String((e.stdout || e.message) + '').slice(0, 2000));
   process.exit(1);
@@ -246,7 +243,11 @@ if (env.result && typeof env.result.path === 'string' && env.result.path.length 
     process.exit(1);
   }
 } else if (env.result && env.result.result) {
+  // Legacy COM Tool V1 wrapped $.evalFile's return under result.result.
   report = env.result.result;
+} else if (env.result && typeof env.result === 'object') {
+  // COM Tool V2 returns the script result directly in the operation envelope.
+  report = env.result;
 } else {
   console.error('live-verify: tool/engine error: ' + JSON.stringify(env).slice(0, 1500));
   process.exit(1);

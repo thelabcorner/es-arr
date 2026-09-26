@@ -1,10 +1,15 @@
-// Live-probe glue: bundled together with callbacks.ts into a single IIFE
-// (global PROBECORE) that the generated engine probe evalFiles. All ES3-safe.
+// Live-probe glue: bundled together with callbacks.ts into a side-effect-only
+// IIFE that publishes $.global.PROBECORE for the generated engine probe.
+//
+// IMPORTANT: this Illustrator boundary must export NOTHING. Exporting revive /
+// runVec and asking esbuild for --global-name recreates the same
+// __export/__defProp module-helper family that the production ES* migration
+// intentionally removed.
 import { runVector } from './callbacks';
 
 // JSON transport markers (vectors contain NaN/Infinity/undefined, which JSON
 // cannot carry; the Node side encodes them, the probe revives them here).
-export function revive(v: any): any {
+function revive(v: any): any {
   if (typeof v === 'string') {
     if (v === '~Undef') { return undefined; }
     if (v === '~NaN') { return NaN; }
@@ -27,6 +32,22 @@ export function revive(v: any): any {
   return o;
 }
 
-export function runVec(vec: any, core: any): any {
+function runVec(vec: any, core: any): any {
   return runVector(revive(vec), core);
+}
+
+var __probeCoreGlobal: any = null;
+try {
+  if (typeof $ !== 'undefined' && $.global) {
+    __probeCoreGlobal = $.global;
+  }
+} catch (e1) {}
+if (!__probeCoreGlobal) {
+  try { __probeCoreGlobal = (Function as any)('return this')(); } catch (e2) {}
+}
+if (__probeCoreGlobal) {
+  __probeCoreGlobal.PROBECORE = {
+    revive: revive,
+    runVec: runVec
+  };
 }
