@@ -11,7 +11,7 @@
 [![Engine parity: live](https://img.shields.io/badge/engine%20parity-live%20238%20vectors-green)](https://extendscript.docsforadobe.dev/)
 [![Adobe: Creative Suite](https://img.shields.io/badge/Adobe%20-Creative%20Suite-red?logo=adobe&logoColor=white)](https://extendscript.docsforadobe.dev/)
 [![Engine](https://img.shields.io/badge/ExtendScript-ES3-green)](#compatibility)
-[![Size](https://img.shields.io/badge/runtime-41%20KB-orange)](#which-build-should-i-use)
+[![Size](https://img.shields.io/badge/runtime-27.5%20KB-orange)](#which-build-should-i-use)
 [![License: GPL-3.0-or-later](https://img.shields.io/badge/license-GPL%203.0--or--later-blue)](https://www.gnu.org/licenses/gpl-3.0.html)
 
 </div>
@@ -162,13 +162,13 @@ The engine is the hard part: array element reads with a variable index cost **~7
 | | **Runtime build** | **Full build** | **Accel bundle** |
 |---|---|---|---|
 | Files | `vendor-esarr-runtime.js` | `vendor-esarr.js`, `ESARR.jsx` | `ESARR.accel.jsx` / `.min.jsx` |
-| Size | 41 KB | 61.7 KB | 115 KB (DLL embedded) |
+| Size | 27.5 KB | 42.9 KB (`ESARR.jsx`) / 47.5 KB (`vendor-esarr.js`) | 128.7 KB (93.0 KB minified) |
 | API | the 39 methods (JSX) | methods + `capabilities()`, `install()`, `benchmark()`, gate | full + self-extracting native gate |
 | Installs `Array.prototype.*` | yes (gap-fill) | yes (gap-fill) | yes (gap-fill) |
 | Native | no DLL | opt-in `enableNativeGate()` | auto-enables (espack) |
 | Best for | per-eval injection, methods only | libraries wanting install control, census, benchmarks | one-file drop-in with the DLL |
 
-**Rule of thumb:** if your script only calls the methods, use the runtime build (41 KB). Reach for the full build for `install({forceReplace})`/`capabilities()`/`benchmark()`/the gate API. Ship the accel bundle when you want the self-extracting `ESARRArray.dll` (native `toSorted`/`toReversed`, ~19x over the JSX fallback) as a single file with no DLL to place — Windows x64 hosts only (see Compatibility).
+**Rule of thumb:** if your script only calls the methods, use the runtime build (27.5 KB). Reach for the full build for `install({forceReplace})`/`capabilities()`/`benchmark()`/the gate API. Ship the accel bundle when you want the self-extracting `ESARRArray.dll` (native `toSorted`/`toReversed`, ~19x over the JSX fallback) as a single file with no DLL to place — Windows x64 hosts only (see Compatibility).
 
 ---
 
@@ -178,9 +178,9 @@ The engine is the hard part: array element reads with a variable index cost **~7
 
 **All production bundles ship as GitHub release assets — this repo holds sources. Grab the runnable builds from the [Releases page](https://github.com/thelabcorner/es-arr/releases).**
 
-[![Release: v1.1.0](https://img.shields.io/badge/release-v1.1.0-blue)](https://github.com/thelabcorner/es-arr/releases)
-[![Released: 2026-08-10](https://img.shields.io/badge/released-2026--08--10-lightgrey)](https://github.com/thelabcorner/es-arr/releases)
-[![Downloads](https://img.shields.io/github/downloads/thelabcorner/es-arr/total?color=blueviolet)](https://github.com/thelabcorner/es-arr/releases)
+[![Latest stable](https://img.shields.io/github/v/release/thelabcorner/es-arr?label=Latest%20stable)](https://github.com/thelabcorner/es-arr/releases/latest)
+[![Release date](https://img.shields.io/github/release-date/thelabcorner/es-arr?label=Released)](https://github.com/thelabcorner/es-arr/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/thelabcorner/es-arr/total?label=Downloads)](https://github.com/thelabcorner/es-arr/releases)
 
 </div>
 
@@ -192,8 +192,12 @@ The engine is the hard part: array element reads with a variable index cost **~7
 
 | You are... | Take this release | And this asset |
 |---|---|---|
-| Dropping one file into the Scripts folder with zero install steps (self-extracting `ESARRArray.dll` + native gate included) | v1.1.0 | `ESARR.accel.min.jsx` |
-| Loading the native DLL from your own `ExternalObject` setup | v1.1.0 | `ESARRArray.dll` |
+| Normal ExtendScript drop-in with prototype installation | Latest stable | `vendor-esarr.js` |
+| High-frequency automation / per-eval injection | Latest stable | `vendor-esarr-runtime.js` |
+| Dropping one file into the Scripts folder with zero install steps (self-extracting `ESARRArray.dll` + native gate included) | Latest stable | `ESARR.accel.min.jsx` (readable: `ESARR.accel.jsx`) |
+| Composing ESARR into an existing ESPACK runtime | Latest stable | `ESARR.facade.jsx` + `ESARR.manifest.json` |
+| Loading the native DLL from your own `ExternalObject` setup | Latest stable | `ESARRArray.dll` |
+| Node.js testing / tooling | Latest stable | `esarr-core.esm.mjs` |
 | Building from source / reading the implementation | master | the repo |
 
 ---
