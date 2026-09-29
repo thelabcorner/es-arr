@@ -78,6 +78,14 @@ function estcBuild(config) {
   });
 }
 
+function gitHead() {
+  try {
+    return execFileSync('git', ['rev-parse', 'HEAD'], { cwd: ROOT, encoding: 'utf8' }).trim();
+  } catch (ignore) {
+    return '';
+  }
+}
+
 mkdirSync(DIST, { recursive: true });
 
 // 1. ESM core bundle (Node harnesses import this).
@@ -92,11 +100,10 @@ estcBuild('./extendscript.vendor.estc.config.mjs');
 estcBuild('./extendscript.runtime.estc.config.mjs');
 estcBuild('./extendscript.runtime-vendor.estc.config.mjs');
 
-// 3. Accelerated self-extracting bundle (ESARR.accel.jsx): espack "1 + n" —
-//    ESARRArray.dll is the payload; the shared ESB64Native accelerator (current
-//    sibling DLL) is embedded and the JSX decode lane is the CURRENT ESTC-built
-//    esb64 runtime, passed explicitly so espack's stale vendored copy cannot
-//    re-enter the composite. The native gate enables on the espack-provided lib.
+// 3. Accelerated self-extracting bundle (ESARR.accel.jsx): ESPACK v2
+//    composition. ESB64 and ESARR are flattened through one persistent ESPAK
+//    control plane; ESARRArray.dll is a capability payload and ESB64Native is
+//    the shared decoder accelerator. The native gate borrows ESPACK's lib.
 //    Requires: ../espack (espack-build.mjs) + ../esb64 (runtime + accel DLL) +
 //    native/bin/ESARRArray.dll (npm run native-build). Skips silently when the
 //    inputs are absent.
@@ -118,7 +125,7 @@ var ACCELERATOR = [
   '      cached = { ok: false, reason: (l && l.error) || "ESPAK load failed" };',
   '      return cached;',
   '    }',
-  '    var caps = ESARR.enableNativeGate({ lib: l.lib, dllPath: l.path });',
+  '    var caps = ESARR.enableNativeGate({ lib: l.lib, dllPath: l.path, owned: false });',
   '    cached = { ok: caps.enabled === true, caps: caps, path: l.path };',
   '    return cached;',
   '  }',
@@ -134,8 +141,9 @@ var ACCELERATOR = [
   ''
 ].join('\n');
 
-function buildAccel() {
+async function buildAccel() {
   var espackBuild = join(ROOT, '..', 'espack', 'espack-build.mjs');
+  var esb64Manifest = join(ROOT, '..', 'esb64', 'dist', 'ESB64.manifest.json');
   var dll = join(ROOT, 'native', 'bin', 'ESARRArray.dll');
   if (!existsSync(espackBuild)) {
     console.log('[esarr-build] accel skipped: espack repo not found at ' + join(ROOT, '..', 'espack'));
@@ -155,27 +163,72 @@ function buildAccel() {
       ' (build ../esb64 native first)');
     return;
   }
-  var accelBundle = join(DIST, '.esarr-accel-bundle.jsx');
-  var manifestOut = join(DIST, 'ESARR.manifest.json');
-  execFileSync(process.execPath, [espackBuild, '--embed', dll, '--out', accelBundle,
-    '--name', 'esarr', '--manifest-out', manifestOut,
-    '--accel', ESB64_ACCEL, '--accel-version', '2', '--quiet'], {
-    stdio: 'inherit',
-    env: Object.assign({}, process.env, {
-      ESB64_RUNTIME_PATH: ESB64_RUNTIME
-    })
-  });
-  var bundleText = readFileSync(accelBundle, 'utf8');
+  if (!existsSync(esb64Manifest)) {
+    console.log('[esarr-build] accel skipped: ESB64 v2 manifest missing at ' + esb64Manifest);
+    return;
+  }
+
   var facadeText = readFileSync(join(DIST, 'ESARR.jsx'), 'utf8');
-  // Lane C (merge architecture v1): the manifest sidecar (pinned schema
-  // contract/manifest-schema-v1) + the loader-free facade artifact for the
-  // composer. The standalone .accel.jsx below is unchanged in composition
-  // (bundle + facade + adapter).
   var facadeOut = facadeText + '\n' + ACCELERATOR +
     '// ESARR.facade.jsx - loader-free facade + espack adapter (composer appends to a merged bundle; requires ESPAK on $.global)\n';
   writeFileSync(join(DIST, 'ESARR.facade.jsx'), facadeOut);
-  var accelOut = bundleText + '\n' + facadeText + '\n' + ACCELERATOR +
-    '// ESARR.accel.jsx - self-extracting single-file bundle (espack 1+n + ESARR + native gate)\n';
+
+  var packageInfo = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8'));
+  var esb64Package = JSON.parse(readFileSync(join(ROOT, '..', 'esb64', 'package.json'), 'utf8'));
+  var espackBuildApi = await import(new URL('../espack/espack-build.mjs', import.meta.url).href);
+  var espackMergeApi = await import(new URL('../espack/espack-merge.mjs', import.meta.url).href);
+  var espackLibraries = await import(new URL('../espack/espack-libraries.mjs', import.meta.url).href);
+  var payloadBytes = readFileSync(dll);
+
+  var library = espackLibraries.libraryFromFile({
+    id: 'esarr',
+    version: packageInfo.version,
+    global: 'ESARR',
+    path: join(DIST, 'ESARR.facade.jsx'),
+    requires: [{ id: 'esb64', range: '^' + esb64Package.version }],
+    contract: [
+      { name: 'forEach', type: 'function' },
+      { name: 'install', type: 'function' },
+      { name: 'enableNativeGate', type: 'function' }
+    ],
+    provenance: {
+      package: packageInfo.name,
+      repository: packageInfo.repository && packageInfo.repository.url,
+      commit: gitHead(),
+      artifact: 'dist/ESARR.facade.jsx'
+    }
+  });
+  var ownManifest = espackBuildApi.makeManifest({
+    bundleName: 'esarr',
+    cacheDir: '',
+    payloads: [{
+      name: 'ESARRArray',
+      version: '1',
+      len: payloadBytes.length,
+      b64: payloadBytes.toString('base64'),
+      fileName: 'ESARRArray_v1.dll'
+    }],
+    accel: null,
+    libraries: [library],
+    entries: [{ id: 'esarr', range: '=' + packageInfo.version }],
+    capabilities: [{
+      id: 'esarr.native',
+      provider: 'esarr',
+      mode: 'optional',
+      payloads: ['ESARRArray'],
+      accel: null
+    }]
+  });
+  var composed = espackMergeApi.merge({
+    manifests: [esb64Manifest, ownManifest],
+    out: join(DIST, 'ESARR.accel.jsx'),
+    manifestOut: join(DIST, 'ESARR.manifest.json'),
+    name: 'esarr',
+    entries: [{ id: 'esarr', range: '=' + packageInfo.version }],
+    deferB64: true
+  });
+  var accelOut = composed.text +
+    '// ESARR.accel.jsx - ESPACK v2 flattened ESB64 -> ESARR composition with one loader/control plane\n';
   writeFileSync(join(DIST, 'ESARR.accel.jsx'), accelOut);
   console.log('[esarr-build] wrote ' + join(DIST, 'ESARR.accel.jsx') + ' (' + accelOut.length + ' bytes)');
   // Cross-repo COM-tool vendoring is intentionally NOT a build side effect.
@@ -212,7 +265,7 @@ function minifyAccel(accelOut) {
 }
 
 if (process.argv.includes('--accel')) {
-  buildAccel();
+  await buildAccel();
 }
 
 console.log('[esarr-build] wrote ' + join(DIST, 'ESARR.jsx') + ', ' + join(DIST, 'vendor-esarr.js') + ', ' +

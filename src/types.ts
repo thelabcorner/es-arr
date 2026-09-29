@@ -35,6 +35,8 @@ export interface EsarrNativeCaps {
   reason: string;
   /** DLL name/path the gate loaded (informational). */
   dll: string;
+  /** Whether ESARR owns the ExternalObject and may unload it. */
+  owned: boolean;
   /** DLL-reported version banner (string, design doc §1.3 version_s). */
   dllVersion: string;
   /** Native-backed method names currently active (subset of the surface). */
@@ -53,6 +55,8 @@ export interface NativeGateOptions {
   lib?: any;
   /** Informational: where lib came from (reported in dll). */
   dllPath?: string;
+  /** True only when ESARR owns the injected lib and may unload it. */
+  owned?: boolean;
   /** Expected ping smoke value. Default 42 (ESON convention). */
   ping?: number;
   /** TEST HOOK ONLY: injects a fake lib in Node tests. */

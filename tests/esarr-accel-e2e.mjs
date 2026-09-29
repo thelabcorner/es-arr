@@ -17,7 +17,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, writeFileSync, rmSync, statSync, readFileSync, readdirSync } from 'node:fs';
 import { join, dirname, basename } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { createLegacyComToolV2Runner } from '../../extendscript-toolchain/src/comtool-v2-compat.mjs';
+import { createComToolRunner } from '../../extendscript-toolchain/src/comtool-compat.mjs';
 import { buildLiveProbe } from './build-live-probe.mjs';
 
 var ROOT = dirname(fileURLToPath(import.meta.url));
@@ -29,12 +29,12 @@ var DIST = join(PROJECT, 'dist');
 var NATIVE = join(PROJECT, 'native', 'bin');
 var DLL = join(NATIVE, 'ESARRArray.dll');
 var BUNDLE = join(DIST, 'ESARR.accel.jsx');
+var MANIFEST = join(DIST, 'ESARR.manifest.json');
 var SCRIPTS = process.env.ESARR_DEV_SCRIPTS || 'C:/Program Files/Adobe/Adobe Illustrator 2026/Presets/en_US/Scripts';
-var ESPACK_BUILD = process.env.ESPACK_BUILD || SCRIPTS + '/espack/espack-build.mjs';
+var ESPACK_MERGE = join(PROJECT, '..', 'espack', 'espack-merge.mjs');
 var CACHE = join(process.env.LOCALAPPDATA || '', 'esarr');
 var SHARED_ACCEL_DIR = join(process.env.LOCALAPPDATA || '', 'espack');
-var COM = createLegacyComToolV2Runner();
-process.on('exit', function () { try { COM.close(); } catch (ignore) {} });
+var COM = createComToolRunner();
 
 var failures = 0;
 function check(name, cond, detail) {
@@ -51,34 +51,39 @@ if (!existsSync(DLL)) {
   console.log('PENDING: native/bin/ESARRArray.dll not built yet (T3 pipeline) — skipping accel e2e');
   process.exit(0);
 }
+if (!existsSync(MANIFEST)) {
+  console.log('PENDING: dist/ESARR.manifest.json not built yet — skipping accel e2e');
+  process.exit(0);
+}
 
 var dllBytes = readFileSync(DLL);
 console.log('E2E: DLL ' + basename(DLL) + ' ' + dllBytes.length + ' bytes; cache ' + CACHE);
 
 // ---- helpers ----------------------------------------------------------------
-function runTool(args, timeoutMs) {
+async function runTool(args, timeoutMs) {
   return COM.run(args, { timeoutMs: timeoutMs || 240000 });
 }
-function evalSmoke(bundlePath, smokeSrc) {
-  var env = runTool(['eval', '--code',
+async function evalSmoke(bundlePath, smokeSrc, refreshEspack) {
+  var env = await runTool(['eval', '--code',
     // The accel bundle is a FACADE + auto native-gate (install is explicit —
     // design §5.3; same contract as ESON.accel). Gap-fill the full surface so
     // the smoke/corpus can exercise prototype wrappers AND the facade.
     '$.evalFile(File("' + bundlePath.replace(/\\/g, '/') + '"));' +
+    (refreshEspack ? 'if (typeof ESARR.useEspack === "function") { ESARR.espack = ESARR.useEspack(); }' : '') +
     'ESARR.install({ forceReplace: true }); return ' + smokeSrc]);
   if (!env.ok) throw new Error('eval failed: ' + JSON.stringify(env).slice(0, 1500));
   return env.result;
 }
-function killAllAutomation() {
+async function killAllAutomation() {
   // Release the V2 target lease and stop only our isolated RuntimeHost before
   // replacing the Illustrator process generation.
-  COM.reset();
+  await COM.reset();
   execFileSync('powershell.exe', ['-NoProfile', '-Command',
     '$p = Get-Process -Name Illustrator -ErrorAction SilentlyContinue; if ($p) { $p | Stop-Process -Force }; exit 0'],
     { timeout: 30000 });
 }
-function launchFresh() {
-  var env = runTool(['status', '--launch'], 120000);
+async function launchFresh() {
+  var env = await runTool(['status', '--launch'], 120000);
   if (!env.ok) throw new Error('instance launch failed: ' + JSON.stringify(env).slice(0, 1000));
   return env.result;
 }
@@ -196,8 +201,8 @@ function bundlePath(version) { return join(DIST, 'esarr-e2e-v' + version + '.jsx
 
 // ---- run ---------------------------------------------------------------------
 console.log('E2E: killing leftover automation and launching a fresh instance...');
-killAllAutomation();
-var instA = launchFresh();
+await killAllAutomation();
+var instA = await launchFresh();
 check('instance A fresh (' + instA.Version + ')', instA.DocumentsCount === 0);
 
 if (existsSync(CACHE)) rmSync(CACHE, { recursive: true, force: true });
@@ -205,7 +210,7 @@ if (existsSync(SHARED_ACCEL_DIR)) rmSync(SHARED_ACCEL_DIR, { recursive: true, fo
 mkdirSync(DIST, { recursive: true });
 
 // v1: eval the production bundle (fresh cache) -> extract -> load -> native
-var s1 = evalSmoke(BUNDLE, SMOKE);
+var s1 = await evalSmoke(BUNDLE, SMOKE);
 check('v1: bundle evals, ESARR installed', s1.ok === true, s1.error);
 check('v1: full surface present (missing empty)', Array.isArray(s1.missing) && s1.missing.length === 0, JSON.stringify(s1.missing));
 check('v1: native gate enabled', !!(s1.gate && s1.gate.enabled), JSON.stringify(s1.gate));
@@ -219,95 +224,78 @@ writeFileSync(e2eVectorsFile, 'var esarrE2eVectors = ' + vectorsJson + ';');
 var corpusEval = '$.evalFile(File("' + e2eVectorsFile.replace(/\\/g, '/') + '"));' +
   '$.evalFile(File("' + BUNDLE.replace(/\\/g, '/') + '"));' +
   'ESARR.install({ forceReplace: true }); return ' + RUN_CORPUS;
-var env1 = runTool(['eval', '--code', corpusEval]);
+var env1 = await runTool(['eval', '--code', corpusEval]);
 check('v1: corpus eval ok', env1.ok && env1.result && env1.result.ok, JSON.stringify(env1).slice(0, 600));
 var e2eFail = env1.result ? compareCorpus(env1.result.result, 'v1-native') : 999;
 check('v1: full corpus matches Node (native mode)', e2eFail === 0, e2eFail + ' mismatch(es)');
 
 // skip-extract re-run: fresh eval, extraction must be skipped (idempotent)
-var s1b = evalSmoke(BUNDLE, SMOKE);
+var s1b = await evalSmoke(BUNDLE, SMOKE);
 var extracted = extractedPath(1);
 var v1mtime = existsSync(extracted) ? statSync(extracted).mtimeMs : 0;
 check('v1: DLL extracted byte-exact', existsSync(extracted) && readFileSync(extracted).equals(dllBytes));
-var s1c = evalSmoke(BUNDLE, SMOKE);
+var s1c = await evalSmoke(BUNDLE, SMOKE);
 check('re-run: native still', !!(s1c.gate && s1c.gate.enabled));
 check('re-run: no re-extraction (mtime unchanged)', existsSync(extracted) && statSync(extracted).mtimeMs === v1mtime, 'mtime changed');
 
-// versioned re-extract: build a bumped bundle
-var espackBuild = await import('file:///' + ESPACK_BUILD.replace(/\\/g, '/').replace(/'/g, ''));
-// cacheDir MUST be pinned to the same CACHE the harness inspects — the
-// production bundle uses defaultCacheDir(BUNDLE_NAME) = %LOCALAPPDATA%/esarr.
-var buildOpts = { embed: DLL, out: bundlePath(2), name: 'esarr-accel-e2e', dllVersion: '2', cacheDir: CACHE.replace(/\\/g, '/') };
-try {
-  var b = espackBuild.build ? espackBuild.build(buildOpts) : espackBuild.default(buildOpts);
-  var v2bundle = b.outPath || bundlePath(2);
-  if (!existsSync(v2bundle)) { // build may have written elsewhere; copy expected name
-    writeFileSync(bundlePath(2), readFileSync(v2bundle));
-    v2bundle = bundlePath(2);
+// versioned re-extract: clone the *production manifest-v2 composition* and
+// change only ESARRArray's payload version. This exercises the same flattened
+// ESB64 -> ESARR library closure and one ESPAK control plane as the release
+// artifact; no legacy payload-only builder or manually appended facade suffix.
+var espackMerge = await import(pathToFileURL(ESPACK_MERGE).href);
+var productionManifest = JSON.parse(readFileSync(MANIFEST, 'utf8'));
+function renderManifestVariant(outPath, cacheDir, payloadVersion) {
+  var variant = JSON.parse(JSON.stringify(productionManifest));
+  if (payloadVersion) {
+    var payload = null;
+    for (var vi = 0; vi < variant.payloads.length; vi++) {
+      if (variant.payloads[vi].name === 'ESARRArray') { payload = variant.payloads[vi]; break; }
+    }
+    if (!payload) throw new Error('production manifest missing ESARRArray payload');
+    payload.version = String(payloadVersion);
+    payload.fileName = 'ESARRArray_v' + String(payloadVersion) + '.dll';
   }
-  // The espack build is ESPACK-only — without the ESARR facade + adapter the
-  // bundle never calls ESPAK.load(0), so the versioned DLL is never extracted
-  // and the gate never engages. Append the production bundle's facade+adapter
-  // suffix (same composition as the fail-path bundle below). The facade starts
-  // at the ESTC-built `var ESARR=` IIFE, which appears exactly once (the espack
-  // section never declares ESARR. The side-effect-only ESTC entry is rooted at
-  // `var __ESARR_ENTRY__=`; starting there preserves the facade publication and
-  // the following ESPACK adapter without depending on the removed `var ESARR=`
-  // namespace-wrapper topology.
-  var prodBundleText = readFileSync(BUNDLE, 'utf8');
-  var facadeStart = prodBundleText.lastIndexOf('var __ESARR_ENTRY__=');
-  if (facadeStart < 0) { throw new Error('production bundle facade marker not found'); }
-  writeFileSync(v2bundle, readFileSync(v2bundle, 'utf8') + '\n' + prodBundleText.substring(facadeStart));
-  var s2 = evalSmoke(v2bundle, SMOKE);
-  check('v2: loaded native with new version', !!(s2.gate && s2.gate.enabled));
-  check('v2: versioned DLL extracted', existsSync(extractedPath(2)));
-  check('v2: v1 still present (locked by host)', existsSync(extracted));
-} catch (e) {
-  console.log('      v2 bundle build skipped (' + String(e.message || e).slice(0, 120) + ')');
+  return espackMerge.merge({
+    manifests: [variant],
+    out: outPath,
+    name: 'esarr',
+    cacheDir: cacheDir.replace(/\\/g, '/'),
+    entries: productionManifest.entries,
+    deferB64: true
+  }).outPath;
 }
+
+var v2bundle = renderManifestVariant(bundlePath(2), CACHE, '2');
+// Library identity is intentionally unchanged, so v2 composition correctly
+// deduplicates ESARR@1.2.0 and does not re-run its activation source. Explicitly
+// re-adopt the upgraded capability payload through the public idempotent hook.
+var s2 = await evalSmoke(v2bundle, SMOKE, true);
+check('v2: loaded native with new version', !!(s2.gate && s2.gate.enabled));
+check('v2: versioned DLL extracted', existsSync(extractedPath(2)));
+check('v2: v1 still present (locked by host)', existsSync(extracted));
 
 // graceful failure: cache dir pointing at an existing FILE -> es3 fallback
 var BLOCKER = join(process.env.LOCALAPPDATA || '', 'esarr-e2e-fail.txt');
 try { if (existsSync(BLOCKER)) rmSync(BLOCKER); } catch (e) {}
 writeFileSync(BLOCKER, 'blocker');
 var failBundle = join(DIST, 'esarr-e2e-fail.jsx');
-try {
-  // The fail-path bundle must be the FULL composition (espack + ESARR facade +
-  // espack adapter) — an espack-ONLY bundle defines ESPAK but never ESARR, so
-  // evalSmoke's ESARR.install() would throw on a fresh instance. Reuse the
-  // production bundle's facade+adapter suffix (everything from the ESTC-built
-  // side-effect entry onward) appended to the espack build output.
-  var fb = espackBuild.build ? espackBuild.build({ embed: DLL, out: failBundle, name: 'esarr-e2e-fail', dllVersion: '1', cacheDir: BLOCKER.replace(/\\/g, '/') }) : null;
-  if (fb) {
-    var prodBundle = readFileSync(BUNDLE, 'utf8');
-    var facadeStart2 = prodBundle.lastIndexOf('var __ESARR_ENTRY__=');
-    if (facadeStart2 < 0) { throw new Error('production bundle facade marker not found'); }
-    var facadeSuffix = prodBundle.substring(facadeStart2);
-    writeFileSync(fb.outPath, readFileSync(fb.outPath, 'utf8') + '\n' + facadeSuffix);
-  }
-  if (fb) {
-    // The fail-path MUST run on a FRESH instance: the v1/v2 evals left a global
-    // ESPAK (and an already-extracted DLL in %LOCALAPPDATA%/esarr) that would
-    // otherwise let the gate come up native even when THIS bundle's cache-dir
-    // extraction must fail. Fresh instance -> only the fail bundle's own state
-    // exists -> a cache-dir write failure must leave the gate OFF (es3).
-    console.log('E2E: fresh instance for the fail-path (cache-dir is a FILE -> must stay es3)...');
-    killAllAutomation();
-    launchFresh();
-    var sf = evalSmoke(fb.outPath || failBundle, SMOKE);
-    check('fail-path: stays es3 (graceful)', !(sf.gate && sf.gate.enabled), JSON.stringify(sf.gate));
-    check('fail-path: no throw, clear error', sf.ok === true, sf.error);
-    // Cleanup below closes this fresh fail-path instance; do not relaunch an
-    // otherwise-unused Illustrator process only to kill it immediately again.
-  }
-} catch (e) {
-  console.log('      fail-path bundle build skipped (' + String(e.message || e).slice(0, 120) + ')');
-}
+renderManifestVariant(failBundle, BLOCKER, '1');
+// The fail-path MUST run on a FRESH instance: the previous evals left a global
+// ESPAK (and an already-extracted DLL in %LOCALAPPDATA%/esarr) that would
+// otherwise let the gate come up native even when THIS bundle's cache-dir
+// extraction must fail. Fresh instance -> only the fail bundle's own state
+// exists -> a cache-dir write failure must leave the gate OFF (es3).
+console.log('E2E: fresh instance for the fail-path (cache-dir is a FILE -> must stay es3)...');
+await killAllAutomation();
+await launchFresh();
+var sf = await evalSmoke(failBundle, SMOKE);
+check('fail-path: stays es3 (graceful)', !(sf.gate && sf.gate.enabled), JSON.stringify(sf.gate));
+check('fail-path: no throw, clear error', sf.ok === true, sf.error);
 try { if (existsSync(BLOCKER)) rmSync(BLOCKER); } catch (e) {}
 
 // ---- cleanup -------------------------------------------------------------------
 console.log('E2E: closing instance...');
-killAllAutomation();
+await killAllAutomation();
 try { rmSync(CACHE, { recursive: true, force: true }); } catch (e) {}
 try { rmSync(SHARED_ACCEL_DIR, { recursive: true, force: true }); } catch (e) {}
 

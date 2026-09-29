@@ -16,15 +16,14 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, writeFileSync, readFileSync, readdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { createLegacyComToolV2Runner } from '../../extendscript-toolchain/src/comtool-v2-compat.mjs';
+import { createComToolRunner } from '../../extendscript-toolchain/src/comtool-compat.mjs';
 import { buildLiveProbe } from './build-live-probe.mjs';
 
 var ROOT = dirname(fileURLToPath(import.meta.url));
 var PROJECT = join(ROOT, '..');
 var DIST = join(PROJECT, 'dist');
 var VENDOR = join(DIST, 'vendor-esarr.js');
-var COM = createLegacyComToolV2Runner();
-process.on('exit', function () { try { COM.close(); } catch (ignore) {} });
+var COM = createComToolRunner();
 
 if (!existsSync(VENDOR)) {
   console.error('live-verify: build first (npm run build) - ' + VENDOR + ' missing');
@@ -198,7 +197,7 @@ writeFileSync(probePath, probeSrc);
 // cross-agent lock serializes; the caller should announce on instances/active.
 console.log('live-verify: ensuring an Illustrator automation instance...');
 try {
-  var launchOut = COM.runText(['status', '--launch'], { timeoutMs: 180000 });
+  var launchOut = await COM.runText(['status', '--launch'], { timeoutMs: 180000 });
   var launchEnv = JSON.parse(launchOut.trim());
   if (!launchEnv.ok) {
     console.error('live-verify: instance launch failed: ' + JSON.stringify(launchEnv).slice(0, 800));
@@ -212,7 +211,7 @@ try {
 console.log('live-verify: running ' + vectors.length + ' vectors in Illustrator (JSX pass + native pass if a DLL certifies)...');
 var pyOut;
 try {
-  pyOut = COM.runText(
+  pyOut = await COM.runText(
     ['eval', '--file', probePath.replace(/\\/g, '/')],
     { timeoutMs: 600000 }
   );
@@ -375,6 +374,7 @@ if (failures > 0 || extraFailures > 0 || gateFailures > 0) {
   process.exit(1);
 }
 console.log('live-verify: all vectors + wrappers verified in the live engine');
+await COM.close();
 
 function esbuildBin() {
   var direct = join(PROJECT, 'node_modules', 'esbuild', 'bin', 'esbuild');

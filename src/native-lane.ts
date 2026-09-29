@@ -117,6 +117,7 @@ var state: {
   active: boolean;
   reason: string;
   lib: any;
+  owned: boolean;
   dll: string;
   dllVersion: string;
   lanes: LaneSet | null;
@@ -130,6 +131,7 @@ var state: {
   active: false,
   reason: '',
   lib: null,
+  owned: false,
   dll: '',
   dllVersion: '',
   lanes: null,
@@ -536,9 +538,11 @@ export function enableNativeGateState(options?: NativeGateOptions): EsarrNativeC
   if (opts.lib) {
     lib = opts.lib;
     state.dll = opts.dllPath || 'external';
+    state.owned = opts.owned === true;
   } else if (opts.provideLib) {
     try {
       lib = opts.provideLib();
+      state.owned = opts.owned === true;
     } catch (e) {
       lib = null;
     }
@@ -554,6 +558,7 @@ export function enableNativeGateState(options?: NativeGateOptions): EsarrNativeC
       var libName = opts.libName || 'ESARRArray';
       lib = new ExternalObject('lib:' + libName);
       state.dll = libName;
+      state.owned = true;
     } catch (e) {
       lib = null;
       state.dll = opts.libName || 'ESARRArray';
@@ -631,7 +636,7 @@ export function nativeBands(): Bands {
 }
 
 export function disableNativeGateState(): void {
-  if (state.lib) {
+  if (state.owned && state.lib) {
     try {
       state.lib.unload();
     } catch (e) {
@@ -639,6 +644,7 @@ export function disableNativeGateState(): void {
     }
   }
   state.lib = null;
+  state.owned = false;
   state.lanes = null;
   state.activeNames = [];
   state.scanLanes = null;
@@ -654,11 +660,12 @@ export function disableNativeGateState(): void {
 // state.reason (the caller sets it before calling teardown).
 function teardown(): EsarrNativeCaps {
   try {
-    if (state.lib && typeof state.lib.unload === 'function') state.lib.unload();
+    if (state.owned && state.lib && typeof state.lib.unload === 'function') state.lib.unload();
   } catch (e) {
     // unload failure is not worth reporting over the enable failure
   }
   state.lib = null;
+  state.owned = false;
   state.lanes = null;
   state.activeNames = [];
   state.scanLanes = null;
@@ -753,6 +760,7 @@ function snapshot(): EsarrNativeCaps {
     enabled: state.active,
     reason: state.reason,
     dll: state.dll,
+    owned: state.owned,
     dllVersion: state.dllVersion,
     lanes: activeList,
     certified: state.certified

@@ -55,6 +55,21 @@ Deterministic random streams and sampling for ExtendScript.
 **[ESUUID](https://github.com/thelabcorner/es-uuid)**  
 RFC 9562 UUID generation, parsing, and conversion for ExtendScript.
 
+**[ESENV](https://github.com/thelabcorner/es-env)**  
+Environment and capability detection for ExtendScript.
+
+**[ESPATH](https://github.com/thelabcorner/es-path)**  
+Deterministic Windows/POSIX path and RFC 8089 file-URI transformations.
+
+**[ESFS](https://github.com/thelabcorner/es-fs)**  
+Synchronous ExtendScript File/Folder I/O with explicit text, BINARY, and replacement semantics.
+
+**[ESHASH](https://github.com/thelabcorner/es-hash)**  
+CRC-32/ISO-HDLC and SHA-256 for byte strings and UTF-8 text.
+
+**[ESLOG](https://github.com/thelabcorner/es-log)**  
+Structured logging with bounded text and JSONL sinks.
+
 </td>
 <td width="50%" valign="top">
 
@@ -80,6 +95,9 @@ Native state and durable storage for Adobe tooling.
 
 **[COMTool](https://github.com/thelabcorner/COMTool)**  
 Guarded COM, ExtendScript, plug-in, and debugger automation for Adobe desktop apps.
+
+**ESsemble** <sub>coming soon</sub>  
+Typed framework, resolver, and composition layer for the ExtendScript toolkit.
 
 **ESOBF** <sub>coming soon</sub>  
 Obfuscation for hardened JSX distribution.
@@ -394,15 +412,17 @@ npm run live-verify    # vectors + wrapper semantics in the real engine (COM too
 npm run benchmark      # ours vs MDN-style vs hand-rolled in the real engine
 ```
 
-**Merge architecture (espack v0.3.0).** `build:accel` also emits two composition
-artifacts for hosts that bundle multiple espack consumers in one file (e.g.
-ArcFit): `dist/ESARR.manifest.json` (schema v1, payload-only, byte-identical
-to `espack-build --manifest-out`) and `dist/ESARR.facade.jsx` (loader-free
-facade + adapter, requires `ESPAK` on `$.global`). A composer merges the
-manifests with `espack-merge.mjs` into ONE loader and appends the facades.
-The adapter loads the payload **by name** (`ESPAK.load("ESARRArray")`) —
-index 0 is not a stable API under a merged bundle. The standalone
-`ESARR.accel.jsx` is unchanged in composition.
+**ESPACK v2 composition.** `build:accel` emits `dist/ESARR.manifest.json`
+(schema v2) and a loader-free `dist/ESARR.facade.jsx`. The manifest records
+ESARR's stable identity/version, activation contract, ESB64 dependency, exact
+UTF-8 byte length and SHA-256 provenance, plus the `ESARRArray` native
+capability. The build resolves `esb64@1.3.0 -> esarr@1.2.0` dependency-first
+through ESPACK's `libraryFromFile`, `makeManifest`, and `merge` APIs. The shipped
+`ESARR.accel.jsx` is the flattened root composition: it contains both libraries,
+one persistent `$.global.ESPAK` control plane, and the shared `ESB64Native`
+accelerator. Its adapter obtains `ESARRArray` by name and borrows the loaded
+ExternalObject (`owned: false`); it does not install a second loader or
+concatenate sibling bundles manually.
 
 The identical TypeScript core (`src/array-core.ts` ES5 set, `src/array-es3.ts` ES3 set, `src/array-es6.ts` ES6+ set, `src/sort-core.ts` shared merge sort) ships as an ESM bundle for Node (tests, differential oracle) and as the ESARR IIFE for the engine. The native gate lives in `src/native-lane.ts` (state machine + per-lane certification, ESON pattern) with the packed int32 wire isolated in `src/lane-wire.ts` (byte+1 encoding, canonical per the design doc) and the facade dispatch in `src/native-dispatch.ts`. Test vectors live in `tests/vectors.ts` with a transport protocol (`{t:'array'|'sparse'|'string'|'like'|'null'}`) that survives JSON round-trips; `tests/callbacks.ts` holds the single canonical callback/runnable logic shared by the Node harness and the live probe — engine agreement implies spec agreement by construction.
 
